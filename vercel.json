@@ -5,5 +5,10 @@
       "maxDuration": 300,
       "excludeFiles": "{.env,.env.*,**/*service-account*.json,tests/**,resources/**,assets/**,.venv/**}"
     }
-  }
+  },
+  "routes": [
+    { "src": "/.*\\.(py|pyc|rules)$", "status": 404 },
+    { "src": "/requirements\\.txt$", "status": 404 },
+    { "handle": "filesystem" }
+  ]
 }
