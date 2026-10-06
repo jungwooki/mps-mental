@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import { appendSummary, summaryText } from '../recording.js';
+const summary={issues:['실수 후 집중 저하'],selfAwareness:[],gameTraining:['훈련 3회'],coaching:['리셋 루틴'],followUp:['사용 여부 확인']};
+const note='기존 메모\n선수의 표현 그대로';
+const combined=appendSummary(note,summary,'2026-10-02');
+assert.ok(combined.startsWith(note+'\n\n--------------------\n\n[AI 상담 요약 / 2026-10-02]'));
+assert.ok(combined.includes('■ 선수 자기인식\n- 미기록'));
+assert.equal((combined.match(/기존 메모/g)||[]).length,1);
+assert.ok(summaryText(summary).startsWith('[Mental Performance 상담 요약]'));
+assert.throws(()=>summaryText({...summary,issues:'invalid'}));
+console.log('Recording summary format and append preservation passed');

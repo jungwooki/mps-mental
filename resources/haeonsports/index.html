@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>해온한의원 스포츠 MPS 클리닉 | 프로 & 엘리트 선수 전담 관리</title>
+    
+    <!-- 프리텐다드 폰트 -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Pretendard', 'sans-serif'],
+                        serif: ['Pretendard', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            navy: '#1e293b',      // 깔끔하고 차분한 네이비
+                            primary: '#2563eb',   // 신뢰감 있는 블루
+                            secondary: '#0284c7', // 포인트 스카이블루
+                            gray: '#64748b',      // 안정적인 슬레이트
+                            light: '#f8fafc',
+                            border: '#e2e8f0'
+                        },
+                        kakao: { bg: '#FEE500', text: '#191919' },
+                        naver: { bg: '#03C75A', text: '#ffffff' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html { font-size: 15px; } 
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #f4f6f8; /* AI스러운 느낌을 빼기 위해 차분한 배경색 사용 */
+            color: #334155;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f8fafc; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tabs (플랫하고 모던한 디자인 적용) */
+        .main-tab { 
+            position: relative; transition: all 0.2s ease; 
+            border-bottom: 2px solid transparent; 
+        }
+        .main-tab.active { 
+            color: #2563eb; font-weight: 700; 
+            border-bottom-color: #2563eb; background-color: #fff; 
+        }
+        
+        .sub-tab { transition: all 0.2s ease; border: 1px solid #cbd5e1; border-radius: 4px; }
+        .sub-tab.active-youth { background-color: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; font-weight: 600; }
+        .sub-tab.active-adult { background-color: #f0fdf4; color: #15803d; border-color: #bbf7d0; font-weight: 600; }
+        .sub-tab.active-encyc { background-color: #f8fafc; color: #334155; border-color: #cbd5e1; font-weight: 600; }
+
+        /* Chart */
+        .chart-container { position: relative; height: 240px; width: 100%; }
+        
+        /* Mobile Menu */
+        #mobile-menu {
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            max-height: 0; opacity: 0; overflow: hidden;
+        }
+        #mobile-menu.open { max-height: 500px; opacity: 1; }
+
+        /* Marquee */
+        .marquee-container { overflow: hidden; white-space: nowrap; position: relative; display: flex; width: 100%; }
+        .marquee-content { display: flex; animation: marquee 30s linear infinite; }
+        .marquee-content:hover { animation-play-state: paused; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* Modal - 플랫 디자인 적용 */
+        #modal-wrapper {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 9999; display: flex; align-items: flex-end; justify-content: center;
+            pointer-events: none;
+        }
+        #modal-wrapper.open { pointer-events: auto; }
+        #modal-backdrop {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(2px);
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        #modal-wrapper.open #modal-backdrop { opacity: 1; }
+        #modal-content {
+            position: relative; width: 100%; max-width: 650px; max-height: 85vh;
+            background: #ffffff; border-radius: 12px 12px 0 0; /* 모서리 둥글기 축소 */
+            display: flex; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.3s ease-out;
+            border-top: 1px solid #e2e8f0;
+        }
+        @media (min-width: 768px) {
+            #modal-wrapper { align-items: center; }
+            #modal-content { 
+                border-radius: 8px; max-height: 80vh; 
+                transform: translateY(15px); opacity: 0; 
+                border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+            #modal-wrapper.open #modal-content { transform: translateY(0); opacity: 1; }
+        }
+        #modal-wrapper.open #modal-content { transform: translateY(0); }
+
+        /* Floating Quick Menu (Bottom Left) */
+        #floating-menu { touch-action: manipulation; }
+        #floating-toggle-btn i { transition: transform 0.3s ease; }
+        #floating-menu.open #floating-toggle-btn i { transform: rotate(135deg); }
+        #floating-toggle-btn { box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35); }
+        .floating-item {
+            display: flex; align-items: center; gap: 9px;
+            background: #1e293b; color: #ffffff;
+            padding: 8px 16px 8px 8px; border-radius: 999px;
+            font-size: 13px; font-weight: 700; white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+            opacity: 0; transform: translateY(8px) scale(0.92);
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        #floating-menu.open .floating-item { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+        .floating-item .fi-ic {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: rgba(255,255,255,0.15); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; flex-shrink: 0;
+        }
+    </style>
+<link rel="stylesheet" href="../../typography.css" data-basecamp-typography>
+</head>
+<body class="pb-24 lg:pb-0">
+
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
+                <img src="logo.png" onerror="this.src='https://placehold.co/200x50/2563eb/ffffff?text=HAEON+LOGO'" alt="해온한의원 로고" class="h-8 object-contain">
+                <div class="hidden sm:block h-4 w-px bg-gray-300 mx-2"></div>
+                <span class="hidden sm:block font-bold text-[15px] tracking-tight text-gray-800">스포츠 MPS 클리닉</span>
+            </div>
+            
+            <nav class="hidden lg:flex items-center gap-7 text-[14px] font-medium text-gray-600">
+                <a href="#intro" class="hover:text-brand-primary transition-colors">소개</a>
+                <a href="#clinic-anchor" onclick="scrollToTab('youth', event)" class="hover:text-brand-primary transition-colors">유소년스포츠</a>
+                <a href="#clinic-anchor" onclick="scrollToTab('adult', event)" class="hover:text-brand-primary transition-colors">성인통증재활</a>
+                <a href="#mps-evaluation" class="hover:text-brand-primary transition-colors">MPS검진평가</a>
+                <a href="#gallery" class="hover:text-brand-primary transition-colors">시설안내</a>
+                <a href="#doctors" class="hover:text-brand-primary transition-colors">의료진</a>
+                <a href="#location" class="hover:text-brand-primary transition-colors">오시는길</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <a href="https://pf.kakao.com/_sYeKE" target="_blank" class="hidden md:flex items-center gap-2 px-4 py-2 bg-kakao-bg text-kakao-text rounded font-bold text-[13px] hover:bg-[#f4d600] transition-colors border border-[#e5cd00]">
+                    <i class="fas fa-comment"></i> 예약/문의
+                </a>
+                <button onclick="toggleMobileMenu()" class="w-10 h-10 rounded border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 lg:hidden">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div id="mobile-menu" class="lg:hidden bg-white border-b border-gray-200">
+            <div class="px-4 py-2 space-y-1">
+                <a href="#intro" onclick="toggleMobileMenu()" class="block px-3 py-3 text-[15px] text-gray-700 hover:bg-gray-50 border-b border-gray-50">클리닉 소개</a>
+                <a href="#clinic-anchor" onclick="scrollToTab('youth', event); toggleMobileMenu()" class="block px-3 py-3 text-[15px] font-semibold text-brand-primary hover:bg-blue-50 border-b border-gray-50">유소년 스포츠 클리닉</a>
+                <a href="#clinic-anchor" onclick="scrollToTab('adult', event); toggleMobileMenu()" class="block px-3 py-3 text-[15px] font-semibold text-brand-primary hover:bg-blue-50 border-b border-gray-50">성인 통증재활 클리닉</a>
+                <a href="#mps-evaluation" onclick="toggleMobileMenu()" class="block px-3 py-3 text-[15px] text-gray-700 hover:bg-gray-50 border-b border-gray-50">MPS 스포츠검진평가</a>
+                <a href="#gallery" onclick="toggleMobileMenu()" class="block px-3 py-3 text-[15px] text-gray-700 hover:bg-gray-50 border-b border-gray-50">클리닉 시설 및 현장</a>
+                <a href="#doctors" onclick="toggleMobileMenu()" class="block px-3 py-3 text-[15px] text-gray-700 hover:bg-gray-50 border-b border-gray-50">의료진 및 자문단</a>
+                <a href="#location" onclick="toggleMobileMenu()" class="block px-3 py-3 text-[15px] text-gray-700 hover:bg-gray-50">오시는 길 (위치안내)</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="intro" class="pt-[64px] relative w-full h-[60vh] md:h-[70vh] min-h-[450px] bg-brand-navy">
+        <div class="swiper heroSwiper w-full h-full">
+            <div class="swiper-wrapper">
+                <!-- Slide 1 -->
+                <div class="swiper-slide relative bg-brand-navy">
+                    <img src="images/teamdoctor.jpg" alt="스포츠 팀닥터" class="w-full h-full object-cover opacity-40 mix-blend-overlay">
+                    <div class="absolute inset-0 flex items-center justify-center text-center">
+                        <div class="max-w-4xl mx-auto px-6">
+                            <span class="inline-block border border-blue-400 text-blue-300 text-xs font-bold px-3 py-1 rounded-sm mb-4 tracking-widest uppercase">Official Team Doctor</span>
+                            <h2 class="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-5 tracking-tight">엘리트 선수를 위한<br>공인 스포츠 팀닥터</h2>
+                            <p class="text-gray-300 text-base md:text-lg break-keep leading-relaxed font-light">대한스포츠한의학회 정규과정을 수료한 공인 팀닥터가<br class="hidden md:block">프로구단 수준의 밀착 관리와 통합 재활을 제공합니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="swiper-slide relative bg-brand-navy">
+                    <img src="images/teamdoctor1.jpg" alt="FIFA 축구의학" class="w-full h-full object-cover opacity-40 mix-blend-overlay">
+                    <div class="absolute inset-0 flex items-center justify-center text-center">
+                        <div class="max-w-4xl mx-auto px-6">
+                            <span class="inline-block border border-blue-400 text-blue-300 text-xs font-bold px-3 py-1 rounded-sm mb-4 tracking-widest uppercase">Global Standard</span>
+                            <h2 class="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-5 tracking-tight">FIFA 축구의학<br>디플로마 수료</h2>
+                            <p class="text-gray-300 text-base md:text-lg break-keep leading-relaxed font-light">세계 축구 연맹(FIFA)이 인증한 글로벌 기준의<br class="hidden md:block">스포츠 부상 진단 및 예방 프로토콜을 임상에 적용합니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 3 -->
+                <div class="swiper-slide relative bg-brand-navy">
+                    <img src="images/teamdoctor2.jpg" alt="RMSK 초음파" class="w-full h-full object-cover opacity-40 mix-blend-overlay">
+                    <div class="absolute inset-0 flex items-center justify-center text-center">
+                        <div class="max-w-4xl mx-auto px-6">
+                            <span class="inline-block border border-blue-400 text-blue-300 text-xs font-bold px-3 py-1 rounded-sm mb-4 tracking-widest uppercase">Precision Diagnosis</span>
+                            <h2 class="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-5 tracking-tight">미국 RMSK 인증<br>정밀 초음파 진단</h2>
+                            <p class="text-gray-300 text-base md:text-lg break-keep leading-relaxed font-light">엑스레이로 보이지 않는 인대 파열과 염증을 실시간으로 확인하여,<br class="hidden md:block">오차 없는 타겟팅 맞춤 치료를 진행합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-pagination mb-2"></div>
+        </div>
+    </section>
+
+    <section class="py-10 bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center divide-y md:divide-y-0 md:divide-x divide-gray-100">
+                <div class="pt-4 md:pt-0 fade-in">
+                    <p class="text-gray-500 text-[12px] font-bold mb-1">2026.07 기준</p>
+                    <p class="text-3xl font-bold text-gray-800"><span class="text-brand-primary">271,526</span>건</p>
+                    <p class="text-[13px] text-gray-500 mt-1">진료 경험 누적 건수</p>
+                </div>
+                <div class="pt-4 md:pt-0 fade-in">
+                    <p class="text-gray-500 text-[12px] font-bold mb-1">프로구단 수준 전담 관리</p>
+                    <p class="text-3xl font-bold text-gray-800"><span class="text-brand-primary">892</span>명</p>
+                    <p class="text-[13px] text-gray-500 mt-1">엘리트(프로) 선수</p>
+                </div>
+                <div class="pt-4 md:pt-0 fade-in">
+                    <p class="text-gray-500 text-[12px] font-bold mb-1">공식 지정 병원 및 제휴</p>
+                    <p class="text-3xl font-bold text-gray-800"><span class="text-brand-primary">92</span>개</p>
+                    <p class="text-[13px] text-gray-500 mt-1">엘리트(프로) 팀</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Marquee -->
+    <section class="border-b border-gray-200 bg-[#f8fafc] py-6 relative">
+        <div class="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#f8fafc] to-transparent z-10"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#f8fafc] to-transparent z-10"></div>
+        <div class="marquee-container">
+           <div class="marquee-content flex gap-12 md:gap-20 px-4 items-center">
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/teamlogo1FC.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <!-- Duplicate for loop -->
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+    <div class="flex items-center justify-center transition-all">
+        <img src="images/team-placeholder.svg" alt="" class="w-24 h-24 md:w-32 md:h-32 object-contain">
+    </div>
+</div>
+        </div>
+    </section>
+
+    <section class="py-16 md:py-24 px-4 bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-14 fade-in">
+                <span class="text-brand-primary font-bold text-xs mb-3 block uppercase tracking-widest">Comprehensive Care</span>
+                <h2 class="text-2xl md:text-4xl font-bold text-gray-900 mb-5 tracking-tight">팀닥터의 유럽식 밀착 관리</h2>
+                <p class="text-gray-600 text-[15px] md:text-[17px] break-keep max-w-3xl mx-auto leading-relaxed">
+                    유소년 선수의 퍼포먼스,<br class="hidden md:block">
+                    <strong>성장단계, 피지컬 위험도, 멘탈 유형, 체질적 약점</strong>의 DATA를 기반으로 강화합니다.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 fade-in">
+                <div class="bg-[#f8fafc] border border-gray-200 rounded-lg p-7 text-center">
+                    <div class="w-12 h-12 mx-auto bg-white border border-gray-200 rounded text-brand-primary flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-brain"></i></div>
+                    <h3 class="font-bold text-[17px] text-gray-900 mb-1">Mental</h3>
+                    <span class="block text-[13px] text-brand-primary font-semibold mb-3">심리 행동 멘탈리티</span>
+                    <p class="text-[14px] text-gray-600 leading-relaxed break-keep">시합전 긴장, 불면, 부상트라우마, 신체화증상 등에 대해 팀닥터, 스포츠심리상담사의 종합 강화 프로그램으로 회복탄력성을 극대화합니다.</p>
+                </div>
+                
+                <div class="bg-[#f8fafc] border border-gray-200 rounded-lg p-7 text-center">
+                    <div class="w-12 h-12 mx-auto bg-white border border-gray-200 rounded text-brand-primary flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-stethoscope"></i></div>
+                    <h3 class="font-bold text-[17px] text-gray-900 mb-1">Physical & Medical</h3>
+                    <span class="block text-[13px] text-brand-primary font-semibold mb-3">내과/체질/부상예방</span>
+                    <p class="text-[14px] text-gray-600 leading-relaxed break-keep">자율신경분석, 스포츠한의학패턴진단을 통한 과훈련증후군(OTS)방지, 복통, 면역저하 등 에너지를 저하시키는 내과적 원인을 개선하며 맞춤식 퍼포먼스 강화처방이 이어집니다.</p>
+                </div>
+                
+                <div class="bg-[#f8fafc] border border-gray-200 rounded-lg p-7 text-center">
+                    <div class="w-12 h-12 mx-auto bg-white border border-gray-200 rounded text-brand-primary flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-running"></i></div>
+                    <h3 class="font-bold text-[17px] text-gray-900 mb-1">Stage of Growth</h3>
+                    <span class="block text-[13px] text-brand-primary font-semibold mb-3">성장단계 고려 개인접근</span>
+                    <p class="text-[14px] text-gray-600 leading-relaxed break-keep">초음파 기반 진단측정, 성장기 선수의 골연령 분석과 연부조직의 분석을 통한 급성장기 전후 맞춤식 강화 프로그램을 제안합니다.</p>
+                </div>
+            </div>
+
+            <div class="bg-brand-navy rounded-lg p-8 md:p-10 text-center fade-in">
+                <h3 class="text-[16px] md:text-lg font-bold text-white mb-6">스포츠한의학 x 스포츠과학 기반 맞춤식 진단 치료 관리</h3>
+                <div class="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto">
+                    <!-- Clean minimal tags -->
+                    <span class="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded text-[13px]">초음파 유도하 약침</span>
+                    <span class="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded text-[13px]">스포츠 추나</span>
+                    <span class="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded text-[13px]">침 치료</span>
+                    <span class="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded text-[13px]">무통 전침</span>
+                    <span class="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded text-[13px]">전기뜸 (온열)</span>
+                    <span class="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded text-[13px]">습식/건식 부항</span>
+                    <span class="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded text-[13px]">스포츠밸런스테이핑</span>
+                    <span class="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded text-[13px]">냉각 치료(이온쿨러)</span>
+                    <span class="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded text-[13px]">TECAR 고주파</span>
+                    <span class="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded text-[13px]">심부 자기장 치료</span>
+                    <span class="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded text-[13px]">멘탈 향기치료</span>
+                    <span class="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded text-[13px]">스포츠한약(도핑프리)</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="mps-evaluation" class="py-16 md:py-24 px-4 bg-[#f8fafc] border-b border-gray-200">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-14 fade-in">
+                <span class="inline-block border border-brand-primary text-brand-primary text-[11px] font-bold px-3 py-1 rounded mb-4 uppercase">Data Analytics</span>
+                <h2 class="text-2xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">MPS 스포츠 검진 평가 시스템</h2>
+                <p class="text-gray-600 text-[15px] break-keep max-w-3xl mx-auto leading-relaxed">
+                    주니어골든에이지의 최신 스포츠MPS측정평가 시스템을 사용합니다.<br class="hidden md:block">
+                    유럽 프로구단의 관리 시스템을 도입하여 <strong>Mental(심리), Physical(위험도), Growth(성장)</strong>을 측정하고<br class="hidden md:block"> 데이터 기반의 최적 훈련량을 제시합니다.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 fade-in">
+                <!-- Flat Design Cards for Charts -->
+                <div class="bg-white rounded-lg p-6 border border-gray-200 flex flex-col h-full">
+                    <div class="flex items-center justify-between mb-5 border-b border-gray-100 pb-3">
+                        <div>
+                            <span class="text-[11px] font-bold text-blue-600">M-Report</span>
+                            <h3 class="text-[16px] font-bold text-gray-800 mt-1">멘탈 5대 지수 (심리)</h3>
+                        </div>
+                    </div>
+                    <div class="chart-container mb-4 flex-grow"><canvas id="chart-mental"></canvas></div>
+                    <p class="text-[13px] text-gray-600 bg-gray-50 p-3 rounded border border-gray-100 mt-auto break-keep leading-relaxed">
+                        <strong>종합 소견:</strong> 회복 탄력성은 우수하나 시합 전 불안(조절 지수)이 높습니다. 인지행동 루틴 코칭을 제안합니다.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-lg p-6 border border-gray-200 flex flex-col h-full">
+                    <div class="flex items-center justify-between mb-5 border-b border-gray-100 pb-3">
+                        <div>
+                            <span class="text-[11px] font-bold text-blue-600">P-Report</span>
+                            <h3 class="text-[16px] font-bold text-gray-800 mt-1">HRV 자율신경 피로도</h3>
+                        </div>
+                    </div>
+                    <div class="chart-container mb-4 flex-grow"><canvas id="chart-physical"></canvas></div>
+                    <p class="text-[13px] text-gray-600 bg-gray-50 p-3 rounded border border-gray-100 mt-auto break-keep leading-relaxed">
+                        <strong>부상 위험도:</strong> 단기 회복력이 저하된 고위험군 상태입니다. 48시간 적극적 리커버리가 필요합니다.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-lg p-6 border border-gray-200 flex flex-col h-full">
+                    <div class="flex items-center justify-between mb-5 border-b border-gray-100 pb-3">
+                        <div>
+                            <span class="text-[11px] font-bold text-blue-600">S-Report</span>
+                            <h3 class="text-[16px] font-bold text-gray-800 mt-1">골연령 기반 성장예측</h3>
+                        </div>
+                    </div>
+                    <div class="chart-container mb-4 flex-grow"><canvas id="chart-growth"></canvas></div>
+                    <p class="text-[13px] text-gray-600 bg-gray-50 p-3 rounded border border-gray-100 mt-auto break-keep leading-relaxed">
+                        <strong>성장 가이드:</strong> 급성장기 진입. 뼈와 인대 성장 속도 불균형으로 점프 부하 축소가 요망됩니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="gallery" class="py-16 md:py-24 px-4 bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12 fade-in">
+                <span class="text-brand-primary font-bold text-xs mb-3 block uppercase tracking-widest">Facilities & Field</span>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4 tracking-tight">클리닉 시설 및 현장</h2>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5 fade-in">
+                <div class="group relative overflow-hidden rounded bg-gray-100 border border-gray-200 aspect-video flex flex-col">
+                    <img src="images/team1.jpg" alt="초음파진단실" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 md:p-4">
+                        <span class="text-white font-bold text-[13px] md:text-sm">근골격계 초음파진단실</span>
+                    </div>
+                </div>
+                <div class="group relative overflow-hidden rounded bg-gray-100 border border-gray-200 aspect-video flex flex-col">
+                    <img src="images/team2.jpg" alt="스포츠 추나교정" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 md:p-4">
+                        <span class="text-white font-bold text-[13px] md:text-sm">스포츠 추나교정재활</span>
+                    </div>
+                </div>
+                <div class="group relative overflow-hidden rounded bg-gray-100 border border-gray-200 aspect-video flex flex-col">
+                    <img src="images/team3.jpg" alt="원내대기공간" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 md:p-4">
+                        <span class="text-white font-bold text-[13px] md:text-sm">쾌적한 원내대기공간</span>
+                    </div>
+                </div>
+                <div class="group relative overflow-hidden rounded bg-gray-100 border border-gray-200 aspect-video flex flex-col">
+                    <img src="images/team4.jpg" alt="팀닥터 파견" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 md:p-4">
+                        <span class="text-white font-bold text-[13px] md:text-sm">대회현장 팀닥터파견</span>
+                    </div>
+                </div>
+                <div class="group relative overflow-hidden rounded bg-gray-100 border border-gray-200 aspect-video flex flex-col">
+                    <img src="images/team5.jpg" alt="성장측정" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 md:p-4">
+                        <span class="text-white font-bold text-[13px] md:text-sm">팀닥터의 성장측정</span>
+                    </div>
+                </div>
+                <div class="group relative overflow-hidden rounded bg-gray-100 border border-gray-200 aspect-video flex flex-col">
+                    <img src="images/team6.jpg" alt="MPS 맞춤평가" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 md:p-4">
+                        <span class="text-white font-bold text-[13px] md:text-sm">MPS 맞춤스포츠평가</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="clinic-anchor"></div>
+    <section id="clinic-section" class="sticky top-[64px] z-40 bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex">
+                <button onclick="switchMainTab('youth')" id="mtab-youth" class="main-tab flex-1 py-4 text-center text-[15px] text-gray-500">
+                    <i class="fa-solid fa-child-reaching text-blue-600 mr-1"></i> 유소년스포츠
+                </button>
+                <button onclick="switchMainTab('adult')" id="mtab-adult" class="main-tab flex-1 py-4 text-center text-[15px] text-gray-500">
+                    <i class="fa-solid fa-person-running text-green-600 mr-1"></i> 성인통증재활
+                </button>
+                <button onclick="switchMainTab('encyc')" id="mtab-encyc" class="main-tab flex-1 py-4 text-center text-[15px] text-gray-500">
+                    <i class="fa-solid fa-book-medical text-gray-600 mr-1"></i> 통증백과사전
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-[#f8fafc] min-h-[600px] py-12 md:py-16 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="bg-white p-6 md:p-8 rounded border border-gray-200 mb-8 flex flex-col md:flex-row gap-6 items-center" id="tab-desc-container">
+                <!-- JS Injected Context -->
+            </div>
+            <div class="mb-6 overflow-x-auto hide-scrollbar pb-1 border-b border-gray-200">
+                <div class="flex gap-2 min-w-max pb-3" id="sub-tabs-container">
+                    <!-- JS Injected Sub Tabs -->
+                </div>
+            </div>
+            <div id="chapter-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- JS Injected Chapter Cards -->
+            </div>
+        </div>
+    </section>
+
+    <section id="doctors" class="py-16 md:py-24 bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-12 fade-in">
+                <span class="inline-block border border-gray-300 text-gray-600 text-[11px] font-bold px-3 py-1 rounded mb-3 uppercase tracking-widest bg-gray-50">Medical Team & Advisors</span>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4 tracking-tight">스포츠한의학 전문가 그룹</h2>
+            </div>
+
+            <!-- Doctors Grid (Flat UI) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 fade-in">
+                <!-- Doctor 1 -->
+                <div class="flex items-start gap-5 p-6 border border-gray-200 rounded-lg bg-[#f8fafc]">
+                    <div class="w-20 h-20 rounded bg-gray-200 overflow-hidden flex-shrink-0 border border-gray-300">
+                        <img src="https://cdn.imweb.me/thumbnail/20250731/6cfba1b61688d.jpg" alt="이정욱 원장" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-900 mb-1">이정욱 원장 <span class="text-[12px] font-normal text-brand-primary ml-1">대표원장</span></h4>
+                        <p class="text-[12px] text-gray-500 mb-3 font-semibold">FIFA축구의학수료 / 스포츠심리상담사</p>
+                        <ul class="text-[13px] text-gray-600 space-y-1 break-keep leading-snug">
+                            <li>- 가천대학교 한의과대학 겸임교수</li>
+                            <li>- 현) 주니어골든에이지 CEO, MPS 기획개발</li>
+                            <li>- 현) 서울대동초 팀닥터</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Doctor 2 -->
+                <div class="flex items-start gap-5 p-6 border border-gray-200 rounded-lg bg-[#f8fafc]">
+                    <div class="w-20 h-20 rounded bg-gray-200 overflow-hidden flex-shrink-0 border border-gray-300">
+                        <img src="https://cdn.imweb.me/thumbnail/20250731/80aa1cb99bdb9.jpg" alt="정지은 원장" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-900 mb-1">정지은 원장 <span class="text-[12px] font-normal text-brand-primary ml-1">한방소아과 전문의</span></h4>
+                        <p class="text-[12px] text-gray-500 mb-3 font-semibold">전 소아과교수 / 스포츠심리상담사</p>
+                        <ul class="text-[13px] text-gray-600 space-y-1 break-keep leading-snug">
+                            <li>- 전) 대전대학교 한의과대학 소아과교수</li>
+                            <li>- 대한한방소아과학회 정회원</li>
+                            <li>- 유소년선수 스포츠영양 및 심리전담</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Doctor 3 -->
+                <div class="flex items-start gap-5 p-6 border border-gray-200 rounded-lg bg-[#f8fafc]">
+                    <div class="w-20 h-20 rounded bg-gray-200 overflow-hidden flex-shrink-0 border border-gray-300">
+                        <img src="https://cdn.imweb.me/thumbnail/20250801/bf8c943efdc87.jpg" alt="한유경 원장" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-900 mb-1">한유경 원장 <span class="text-[12px] font-normal text-brand-primary ml-1">RMSK 초음파전문가</span></h4>
+                        <p class="text-[12px] text-gray-500 mb-3 font-semibold">스포츠한의학팀닥터 / 스포츠심리상담사</p>
+                        <ul class="text-[13px] text-gray-600 space-y-1 break-keep leading-snug">
+                            <li>- 미국 근골격계 초음파 자격(APCA RMSK)</li>
+                            <li>- 대한한의영상학회 정회원</li>
+                            <li>- 스포츠 부상 타겟팅 초음파 및 추나 전담</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Doctor 4 -->
+                <div class="flex items-start gap-5 p-6 border border-gray-200 rounded-lg bg-[#f8fafc]">
+                    <div class="w-20 h-20 rounded bg-gray-200 overflow-hidden flex-shrink-0 border border-gray-300">
+                        <img src="https://cdn.imweb.me/thumbnail/20250731/4618b2bf06bb4.jpg" alt="조내경 원장" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg text-gray-900 mb-1">조내경 원장 <span class="text-[12px] font-normal text-brand-primary ml-1">통증재활 전담</span></h4>
+                        <p class="text-[12px] text-gray-500 mb-3 font-semibold">스포츠심리상담사</p>
+                        <ul class="text-[13px] text-gray-600 space-y-1 break-keep leading-snug">
+                            <li>- 한방소아과학회 정회원</li>
+                            <li>- 한방부인과학회 정회원</li>
+                            <li>- 선수 가족 심리상담 및 재활프로그램 기획</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advisors Section -->
+            <div class="bg-[#f8fafc] border border-gray-200 p-6 md:p-8 rounded-lg fade-in">
+                <h3 class="text-[16px] font-bold text-gray-800 mb-6 border-b border-gray-200 pb-3">R&D 어드바이저 그룹</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded border border-gray-200">
+                        <h4 class="font-bold text-[14px] text-gray-900 mb-1">김학인</h4>
+                        <p class="text-[12px] text-gray-600 break-keep leading-snug">- 전 대한축구협회 축구현장 스페셜리스트<br>- 현장, 협회, 팀 스포츠과학 소통 담당</p>
+                    </div>
+                    <div class="bg-white p-4 rounded border border-gray-200">
+                        <h4 class="font-bold text-[14px] text-gray-900 mb-1">황원</h4>
+                        <p class="text-[12px] text-gray-600 break-keep leading-snug">- 전 성남FC 프로축구선수, 스포츠심리상담사<br>- 엘리트선수 소통 및 멘탈강화 책임자</p>
+                    </div>
+                    <div class="bg-white p-4 rounded border border-gray-200">
+                        <h4 class="font-bold text-[14px] text-gray-900 mb-1">IDO KENTA</h4>
+                        <p class="text-[12px] text-gray-600 break-keep leading-snug">- 현 나고야 다이도고교 체육교사<br>- 일본 현장 축구코디네이터, 어드바이저</p>
+                    </div>
+                    <div class="bg-white p-4 rounded border border-gray-200">
+                        <h4 class="font-bold text-[14px] text-gray-900 mb-1">양우영</h4>
+                        <p class="text-[12px] text-gray-600 break-keep leading-snug">- 2급 중등정교사, LEE 법률사무소<br>- 엘리트 선수, 부모 커뮤니케이션 책임자</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="location" class="py-16 md:py-24 bg-brand-navy border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 fade-in">
+            <div class="flex flex-col lg:flex-row gap-10 items-start">
+                <div class="w-full lg:w-1/2 text-white pt-4">
+                    <span class="border border-blue-400 text-blue-300 px-2 py-0.5 text-xs font-bold uppercase tracking-widest rounded-sm mb-4 inline-block">Location</span>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-5">오시는 길</h2>
+                    <p class="text-gray-300 text-[15px] mb-10 break-keep leading-relaxed font-light">엘리트 선수의 멘탈, 피지컬, 성장강화를 통한<br>퍼포먼스 향상을 위한 스포츠진료 중심 한의원입니다.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-9 h-9 rounded bg-slate-800 border border-slate-700 flex items-center justify-center flex-shrink-0 mt-0.5"><i class="fa-solid fa-map-marker-alt text-gray-300"></i></div>
+                            <div>
+                                <h4 class="text-[15px] font-bold mb-1">서울 본점 (신도림)</h4>
+                                <p class="text-gray-400 text-[14px] font-light">서울특별시 구로구 새말로 97,<br>신도림 테크노마트 2층 9호</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-9 h-9 rounded bg-slate-800 border border-slate-700 flex items-center justify-center flex-shrink-0 mt-0.5"><i class="fa-solid fa-clock text-gray-300"></i></div>
+                            <div>
+                                <h4 class="text-[15px] font-bold mb-1">진료시간</h4>
+                                <p class="text-gray-400 text-[14px] font-light leading-relaxed">
+                                    평일: 10:00 ~ 20:00 (월, 수 21시까지 야간진료)<br>
+                                    토요일: 10:00 ~ 15:00 (스포츠선수는 18:00까지 연장)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="w-full lg:w-1/2 h-[350px] md:h-[400px] rounded border border-slate-700 overflow-hidden relative">
+                    <img src="images/map.jpg" alt="지도" class="w-full h-full object-cover opacity-50 mix-blend-overlay">
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div class="bg-black/60 px-5 py-2.5 rounded border border-slate-600 text-white font-bold flex items-center gap-2 text-[14px]">
+                            <i class="fa-solid fa-location-dot text-blue-400"></i> 1,2호선 신도림역 테크노마트 2층
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-white pt-12 pb-24 md:pb-12 border-t border-gray-200">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-start gap-6 mb-8">
+                <div>
+                    <h3 class="font-bold text-gray-800 mb-2">해온한의원 스포츠 클리닉</h3>
+                    <p class="text-gray-500 text-[13px] leading-relaxed break-keep">부상 없는 더 큰 도약을 위해, 엘리트 스포츠의 표준을 만듭니다.<br>대표원장: 이정욱 | 서울특별시 구로구 새말로 97, 신도림 테크노마트 2층 9호</p>
+                </div>
+                <div class="flex gap-2">
+                    <a href="https://pf.kakao.com/_sYeKE" target="_blank" class="w-10 h-10 rounded border border-gray-200 flex items-center justify-center text-gray-500 hover:text-kakao-text hover:bg-kakao-bg transition-colors"><i class="fa-solid fa-comment"></i></a>
+                </div>
+            </div>
+            <div class="border-t border-gray-100 pt-5 text-[12px] text-gray-400 flex flex-col md:flex-row justify-between gap-3">
+                <p>&copy; 2026 HAEON LAB of Sports (JuniorGoldenAge). All rights reserved.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="hover:text-gray-600">이용약관</a>
+                    <a href="#" class="hover:text-gray-600">개인정보처리방침</a>
+                </div>
+            </div>
+            <div class="mt-4 text-[11px] text-gray-400 leading-relaxed break-keep">
+                본 안내서는 질환을 스스로 진단하기 위한 자료가 아니라, 증상을 이해하고 적절한 평가와 치료 방향을 결정하기 위한 교육 자료입니다. 정확한 진단과 시기별 맞춤 치료를 위해 한의사/의사의 진료가 반드시 필요합니다.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Fixed Bottom -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 pb-safe">
+        <div class="px-4 py-2 flex gap-2">
+            <a href="https://pf.kakao.com/_sYeKE" target="_blank" class="flex-1 bg-kakao-bg text-kakao-text py-3 rounded font-bold text-center border border-[#e5cd00] flex items-center justify-center gap-2 text-[14px]">
+                <i class="fas fa-comment"></i> 카톡 문의
+            </a>
+            <a href="https://m.booking.naver.com/booking/6/bizes/150330?theme=place&service-target=map-pc&lang=ko&area=bmp&map-search=1" target="_blank" class="flex-1 bg-naver-bg text-naver-text py-3 rounded font-bold text-center border border-[#02b350] flex items-center justify-center gap-2 text-[14px]">
+                <i class="far fa-calendar-check"></i> 네이버 예약
+            </a>
+        </div>
+    </div>
+
+    <!-- Floating Quick Menu (Bottom Left) -->
+    <div id="floating-menu" class="fixed left-4 lg:left-6 bottom-24 lg:bottom-8 z-50 flex flex-col-reverse items-start gap-2.5">
+        <button onclick="toggleFloatingMenu()" id="floating-toggle-btn" class="w-14 h-14 rounded-full bg-brand-primary text-white flex items-center justify-center text-xl hover:bg-blue-700 active:scale-95 transition-all border-2 border-white flex-shrink-0">
+            <i class="fa-solid fa-plus" id="floating-toggle-icon"></i>
+        </button>
+        <a href="tel:02-2135-1075" class="floating-item">
+            <span class="fi-ic"><i class="fa-solid fa-phone"></i></span>전화 상담
+        </a>
+        <a href="https://pf.kakao.com/_sYeKE" target="_blank" class="floating-item">
+            <span class="fi-ic" style="background:#FEE500;color:#191919"><i class="fa-solid fa-comment"></i></span>카톡 상담
+        </a>
+        <a href="https://m.booking.naver.com/booking/6/bizes/150330?theme=place&service-target=map-pc&lang=ko&area=bmp&map-search=1" target="_blank" class="floating-item">
+            <span class="fi-ic" style="background:#03C75A;color:#fff"><i class="far fa-calendar-check"></i></span>네이버 예약
+        </a>
+        <a href="#clinic-anchor" onclick="scrollToTab('encyc', event); closeFloatingMenu()" class="floating-item">
+            <span class="fi-ic"><i class="fa-solid fa-book-medical"></i></span>통증백과사전
+        </a>
+        <a href="#clinic-anchor" onclick="scrollToTab('youth', event); closeFloatingMenu()" class="floating-item">
+            <span class="fi-ic"><i class="fa-solid fa-child-reaching"></i></span>유소년 클리닉
+        </a>
+        <a href="#intro" onclick="scrollToTopAndClose(event)" class="floating-item">
+            <span class="fi-ic"><i class="fa-solid fa-arrow-up"></i></span>맨 위로
+        </a>
+    </div>
+
+    <div id="modal-wrapper">
+        <div id="modal-backdrop" onclick="closeModal()"></div>
+        <div id="modal-content">
+            <div class="px-5 py-4 border-b border-gray-200 flex justify-between items-start bg-gray-50 rounded-t-lg">
+                <div class="pr-2">
+                    <span id="modal-tag" class="font-bold text-[10px] bg-white border border-gray-300 text-gray-600 px-2 py-0.5 rounded-sm inline-block mb-1.5 uppercase">TAG</span>
+                    <h3 id="modal-title" class="text-[18px] md:text-xl font-bold text-gray-900 leading-tight">Title</h3>
+                    <p id="modal-subtitle" class="text-[13px] text-gray-500 mt-1">Subtitle</p>
+                </div>
+                <button onclick="closeModal()" class="w-8 h-8 rounded border border-gray-200 bg-white text-gray-500 hover:bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modal-body" class="p-5 md:p-6 overflow-y-auto hide-scrollbar flex-grow text-[14px] md:text-[15px] bg-white pb-20">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    // 객체(Object) 파라미터를 받아 HTML 문자열을 반환하는 안전한 렌더링 함수
+    // AI스러운 복잡한 디자인을 제거하고, 깔끔한 구분선(border)과 명확한 컬러칩 기반으로 정리
+    function mHTML(data) {
+        let html = `
+            <div class="border border-gray-200 rounded-md p-4 mb-5 bg-[#f8fafc]">
+                <h5 class="font-bold text-brand-navy mb-2 border-b border-gray-200 pb-2 text-[15px]">💡 질환의 이해</h5>
+                <p class="text-gray-700 leading-relaxed text-[14px] break-keep">${data.summary}</p>
+            </div>
+        `;
+
+        if (data.symptoms && data.symptoms.length > 0) {
+            html += `
+                <h5 class="font-bold text-gray-800 mb-2 mt-6 text-[15px]">⚠️ 주요 의심 증상</h5>
+                <ul class="list-disc pl-5 mb-5 text-gray-700 space-y-1 text-[14px] break-keep">
+            `;
+            data.symptoms.forEach(s => html += `<li>${s}</li>`);
+            html += `</ul>`;
+        }
+
+        if (data.redSign) {
+            html += `
+                <div class="border border-red-200 bg-red-50 p-4 rounded-md mb-6">
+                    <h5 class="font-bold text-red-600 mb-1 text-[14px]">🚨 RED SIGN (즉시 진료 요망)</h5>
+                    <p class="text-red-700 text-[13px] break-keep">${data.redSign}</p>
+                </div>
+            `;
+        }
+
+        html += `
+            <h5 class="font-bold text-brand-navy mb-3 mt-8 border-b border-gray-200 pb-2 text-[15px]">🎯 해온 MPS 맞춤 치료</h5>
+            <div class="space-y-4">
+                <div class="flex items-start gap-3">
+                    <span class="bg-rose-100 text-rose-700 font-bold px-2 py-0.5 rounded text-[11px] shrink-0 mt-0.5 border border-rose-200">1단계: 급성</span>
+                    <p class="text-gray-700 leading-relaxed m-0 text-[14px] break-keep">${data.acute}</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded text-[11px] shrink-0 mt-0.5 border border-emerald-200">2단계: 재생</span>
+                    <p class="text-gray-700 leading-relaxed m-0 text-[14px] break-keep">${data.regen}</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="bg-blue-100 text-blue-700 font-bold px-2 py-0.5 rounded text-[11px] shrink-0 mt-0.5 border border-blue-200">3단계: 강화</span>
+                    <p class="text-gray-700 leading-relaxed m-0 text-[14px] break-keep">${data.strength}</p>
+                </div>
+            </div>
+        `;
+        return html;
+    }
+
+    // --- STREAMING_CHUNK: Massive Disease Data (Corrected & Formatted) ---
+    const DB = {
+        youth: {
+            desc: { title: "작은 어른이 아닙니다 👦", text: "성장기 아이들의 몸은 어른을 축소해 놓은 것이 아닙니다. 뼈가 인대보다 약하고, 급성장기에 뼈와 근육의 불균형이 생깁니다. 1% 엘리트 유망주를 위한 특화 진단과 멘탈/영양 관리를 제공합니다." },
+            categories: [
+                { id: 'y1', title: '우리 아이 몸 알아보기' },
+                { id: 'y2', title: '종목별 특화 부상' },
+                { id: 'y3', title: '내과 / 영양 & 멘탈' }
+            ],
+            chapters: [
+                { id: 'y1-1', cat: 'y1', title: "인대보다 뼈가 먼저 다쳐요", subtitle: "성장판 견열 골절의 위험성", tag: "뼈 특징", 
+                  content: mHTML({
+                      summary: "아이들은 관절이 꺾일 때 질긴 인대는 버티고, 약한 뼈(성장판 부위) 조각이 떨어져 나가는 '견열 골절'이 매우 흔합니다.",
+                      symptoms: ["복숭아뼈나 발등 뼈 자체를 누르면 극심한 통증", "일반적인 삠(염좌)보다 붓기가 심하고 오래감"],
+                      redSign: "통증 부위의 뼈를 눌렀을 때 자지러지게 아프거나 아예 딛지 못할 때",
+                      acute: "초기 이온쿨러(극저온)와 보호대 고정, 사혈 부항으로 응급 붓기를 급속 억제합니다.",
+                      regen: "초음파 가이드 진단을 통해 뼛조각 유무를 확인하고, 뼈 강화를 돕는 약침을 주입합니다.",
+                      strength: "인대 강화 한약 처방과 함께 밸런스 패드 훈련으로 재발을 방지합니다."
+                  }) 
+                },
+                { id: 'y1-2', cat: 'y1', title: "뼈는 자라는데 근육이 짧아요", subtitle: "급성장기 뼈와 근육의 불균형", tag: "급성장기", 
+                  content: mHTML({
+                      summary: "키가 훌쩍 크는 '급성장기(PHV)'에는 뼈의 성장 속도를 근육이 따라가지 못해 고무줄처럼 팽팽해집니다. 이 상태에서 뛰면 뼈가 당겨져 염증이 생깁니다.",
+                      symptoms: ["무릎 앞쪽 뼈가 튀어나오고 아픔 (오스굿씨)", "발뒤꿈치를 누르면 아파서 까치발로 걸음 (세버병)"],
+                      redSign: "",
+                      acute: "무거운 역기 운동 등 훈련 부하를 30% 줄이고 극저온 치료로 급성 염증을 제어합니다.",
+                      regen: "초음파 가이드 침과 무통 전침으로 뻣뻣해진 근육의 장력을 부드럽게 이완시킵니다.",
+                      strength: "스포츠 추나를 통해 근육 길이를 확보하고 구조적 부하를 점진적으로 줄입니다."
+                  }) 
+                },
+                { id: 'y1-3', cat: 'y1', title: "갑자기 몸치(?)가 된 아이들", subtitle: "고유수용감각 저하와 뇌-신체 엇박자", tag: "감각 저하", 
+                  content: mHTML({
+                      summary: "팔다리가 훅 길어지면 뇌가 몸의 길이와 무게를 100% 인지하지 못합니다. (고유수용감각 저하). 이로 인해 스텝이 꼬이고 대형 부상의 위험이 높아집니다.",
+                      symptoms: ["최근 들어 자주 넘어지거나 스텝이 꼬임", "이전보다 순발력이나 턴 동작이 현저히 둔해짐"],
+                      redSign: "",
+                      acute: "고강도 턴 동작 등 억지 무리한 훈련을 중지시켜 십자인대 파열 등을 선제 방어합니다.",
+                      regen: "초음파 가이드 침과 자기장 치료로 둔화된 신경-근육의 반응 속도를 일깨웁니다.",
+                      strength: "전문화된 고유수용감각(밸런스 패드) 훈련을 점진적으로 도입하여 신체 컨트롤 능력을 회복합니다."
+                  }) 
+                },
+                { id: 'y2-1', cat: 'y2', title: "오스굿-슐라터병", subtitle: "점프와 킥을 많이 하는 아이들의 무릎 앞 통증", tag: "무릎 질환", 
+                  content: mHTML({
+                      summary: "대퇴사두근(허벅지 근육)이 무릎 아래 정강이뼈(경골 결절)를 강하게 반복적으로 잡아당겨 염증과 뼈의 돌출을 유발합니다.",
+                      symptoms: ["무릎 바로 아래 뼈가 볼록하게 튀어나옴", "뛰거나 공을 찰 때, 계단을 오를 때 해당 부위 압통"],
+                      redSign: "휴식 중에도 욱신거리거나, 무릎을 아예 굽히지 못할 때",
+                      acute: "이온쿨러 냉각으로 뼈 부착부의 급성 염증과 열감을 제어합니다.",
+                      regen: "긴장된 허벅지 근육을 약침과 전침으로 이완하여 뼈에 가해지는 장력을 대폭 줄입니다.",
+                      strength: "스포츠밸런스테이핑으로 운동 중 허벅지 근육의 부하를 분산시킵니다."
+                  }) 
+                },
+                { id: 'y2-2', cat: 'y2', title: "SLJ 증후군", subtitle: "농구, 배구 유망주의 무릎 덮개뼈 통증", tag: "무릎 질환", 
+                  content: mHTML({
+                      summary: "오스굿씨병과 유사하나, 염증 위치가 정강이뼈가 아닌 '무릎 덮개뼈(슬개골) 하단'에 발생합니다. 반복적인 점프와 착지에서 비롯됩니다.",
+                      symptoms: ["점프 후 착지할 때 무릎 덮개뼈 밑부분의 예리한 통증", "해당 부위를 누르면 통증이 명확함"],
+                      redSign: "",
+                      acute: "급성기 훈련 중단 및 이온쿨러 찜질로 초기 염증을 가라앉힙니다.",
+                      regen: "건 부착부에 초음파 가이드 약침을 시술하여 강력하게 손상 조직 재생을 돕습니다.",
+                      strength: "충격을 분산시키는 스포츠밸런스테이핑을 적용하여 훈련 시 부하를 제어합니다."
+                  }) 
+                },
+                { id: 'y2-3', cat: 'y2', title: "세버병 (Sever's Disease)", subtitle: "발뒤꿈치 성장판의 통증", tag: "족부 질환", 
+                  content: mHTML({
+                      summary: "종아리 근육과 이어진 아킬레스건이 발뒤꿈치 성장판 뼈를 계속 잡아당겨 염증이 발생합니다. 딱딱한 축구화나 트랙이 주원인입니다.",
+                      symptoms: ["운동 후 발뒤꿈치 바닥이나 뒤쪽이 아파 절뚝거림", "양옆에서 뒤꿈치 뼈를 쥐어짜듯 누르면 몹시 아파함"],
+                      redSign: "",
+                      acute: "푹신한 힐패드 처방을 지도하고 냉각 치료로 통증을 신속히 억제합니다.",
+                      regen: "팽팽한 종아리 근육을 초음파 가이드 침과 저주파 치료로 부드럽게 이완시킵니다.",
+                      strength: "아킬레스건 스트레칭 루틴과 족저근막 이완 마사지로 발목 유연성을 확보합니다."
+                  }) 
+                },
+                { id: 'y2-4', cat: 'y2', title: "중족골 피로골절", subtitle: "쉬지 못한 발등 뼈에 실금이 가는 현상", tag: "발등 골절", 
+                  content: mHTML({
+                      summary: "특별한 충돌 없이, 단단한 지면에서의 반복적 러닝이나 점프로 인해 발등 뼈(주로 2~4번, 5번 중족골)에 미세한 금이 간 상태입니다.",
+                      symptoms: ["뛰거나 체중을 실을 때 발등 특정 부위가 욱신거림", "누르면 명확하게 아픈 국소 부위가 존재"],
+                      redSign: "발등이 눈에 띄게 붓고 붉어지며, 전혀 디딜 수 없음",
+                      acute: "체중 부하를 절대 금지하고 초음파로 골절 부위를 정밀 타겟팅합니다.",
+                      regen: "심부 자기장 치료와 약침으로 골유합(뼈가 붙는 과정) 세포를 자극합니다.",
+                      strength: "뼈를 튼튼하게 하는 맞춤 한약 처방으로 재골절을 예방합니다."
+                  }) 
+                },
+                { id: 'y3-1', cat: 'y3', title: "스포츠 에너지 결핍증 (RED-S)", subtitle: "훈련량 대비 영양/휴식 부족", tag: "내과/영양", 
+                  content: mHTML({
+                      summary: "운동에 에너지를 과다하게 소모하여 성장에 필요한 호르몬, 뼈 대사, 면역 기능에 쓸 에너지가 바닥난 심각한 상태입니다.",
+                      symptoms: ["키 성장이 멈추거나 잦은 피로 골절 발생", "만성 소화불량, 잦은 감기, 기력 저하"],
+                      redSign: "극심한 체중 감소 또는 원인 모를 잦은 골절",
+                      acute: "소아과 전문의 진단 하에 즉각적인 휴식과 고열량 영양 식단을 가이드합니다.",
+                      regen: "위장 흡수력을 극대화하고 에너지를 보충하는 보허(補虛) 맞춤 한약을 처방합니다.",
+                      strength: "주기적인 체성분 분석으로 훈련 스케줄과 영양 밸런스를 지속 모니터링합니다."
+                  }) 
+                },
+                { id: 'y3-2', cat: 'y3', title: "오버트레이닝 증후군 (OTS)", subtitle: "자율신경계 파업 선언", tag: "피로/회복", 
+                  content: mHTML({
+                      summary: "휴식 없이 고강도 훈련이 누적되어 신체의 자율신경계가 교란되고 회복 능력을 상실한 번아웃 상태입니다.",
+                      symptoms: ["훈련을 해도 기록이나 퍼포먼스가 오히려 떨어짐", "안정 시 심박수 증가, 불면증, 식욕 부진"],
+                      redSign: "",
+                      acute: "HRV(자율신경) 검사 확인 후, 사혈 부항과 전침으로 전신 피로물질을 강제 배출합니다.",
+                      regen: "안신(安神) 작용을 하는 맞춤 한약과 침 치료로 부교감신경을 안정화합니다.",
+                      strength: "심리상담사의 인지행동 코칭으로 멘탈 회복탄력성을 극대화합니다."
+                  }) 
+                },
+                { id: 'y3-3', cat: 'y3', title: "번아웃 증후군", subtitle: "운동에 대한 흥미와 동기의 소진", tag: "멘탈/번아웃", 
+                  content: mHTML({
+                      summary: "훈련과 성적에 대한 압박이 누적되어 운동에 대한 흥미와 동기가 사라지고 정서적으로 완전히 지쳐버린 상태입니다. 신체 회복이 우선인 OTS와 달리 정서적 소진과 무기력감이 핵심입니다.",
+                      symptoms: ["예전엔 좋아하던 훈련·시합이 하기 싫고 무기력함", "사소한 실수에도 쉽게 좌절하고 자신감이 급격히 저하됨"],
+                      redSign: "",
+                      acute: "심리상담사와의 1:1 면담으로 소진 정도를 객관적으로 평가하고 단기 휴식 계획을 세웁니다.",
+                      regen: "안신(安神) 작용의 스포츠한약(도핑프리)과 멘탈 향기치료로 긴장된 정서를 안정시킵니다.",
+                      strength: "목표 재설정과 회복탄력성 훈련을 통해 운동에 대한 동기와 즐거움을 단계적으로 회복시킵니다."
+                  }) 
+                },
+                { id: 'y3-4', cat: 'y3', title: "범불안증후군", subtitle: "일상 전반으로 번지는 과도한 걱정", tag: "멘탈/불안", 
+                  content: mHTML({
+                      summary: "특정 시합 상황을 넘어 훈련, 학업, 관계 등 일상 전반에 대해 과도하고 통제하기 어려운 걱정이 지속되는 상태입니다. 근긴장, 소화불량 등 신체 증상을 동반하기도 합니다.",
+                      symptoms: ["뚜렷한 이유 없이 늘 긴장되고 불안한 느낌이 지속됨", "가슴 두근거림, 소화불량, 두통 등 신체 증상 동반"],
+                      redSign: "",
+                      acute: "자율신경 균형 상태를 확인하고, 침 치료와 멘탈 향기치료로 긴장을 즉각적으로 이완시킵니다.",
+                      regen: "심신을 안정시키는 스포츠한약(도핑프리)을 처방하여 과각성된 신경계를 조절합니다.",
+                      strength: "심리상담사와의 정기 상담을 병행하여 불안에 대응하는 인지적 대처 기술을 길러줍니다."
+                  }) 
+                },
+                { id: 'y3-5', cat: 'y3', title: "수면장애", subtitle: "회복과 성장을 방해하는 불안정한 잠", tag: "멘탈/수면", 
+                  content: mHTML({
+                      summary: "훈련 스트레스, 성장호르몬 분비 리듬 변화, 스마트기기 사용 등이 겹쳐 잠들기 어렵거나 깊이 못 자는 상태입니다. 수면 부족은 회복과 성장, 집중력 저하로 직결됩니다.",
+                      symptoms: ["잠들기까지 30분 이상 걸리거나 밤에 자주 깸", "충분히 잔 것 같아도 낮에 심하게 졸리거나 예민함"],
+                      redSign: "",
+                      acute: "수면 패턴을 함께 점검하고, 멘탈 향기치료로 취침 전 긴장을 완화하는 루틴을 잡아줍니다.",
+                      regen: "심신을 편안하게 하는 스포츠한약(도핑프리)을 처방하여 수면의 질을 개선합니다.",
+                      strength: "성장기 회복에 필요한 수면 시간과 훈련 강도를 함께 조율해 재발을 방지합니다."
+                  }) 
+                },
+                { id: 'y3-6', cat: 'y3', title: "틱장애", subtitle: "긴장할 때 반복되는 움직임과 소리", tag: "멘탈/틱", 
+                  content: mHTML({
+                      summary: "긴장이나 스트레스가 높아질 때 본인의 의지와 상관없이 눈 깜빡임, 헛기침, 어깨 들썩임 등의 움직임이나 소리가 반복되는 상태입니다. 시합 압박이 큰 유소년 선수에서 악화되기도 합니다.",
+                      symptoms: ["특정 근육의 움직임(눈 깜빡임, 얼굴 찡그림 등)이 반복됨", "긴장하거나 피곤할 때 증상이 심해지는 경향"],
+                      redSign: "일상생활이나 학교생활에 지장을 줄 정도로 증상이 심해질 때",
+                      acute: "증상을 악화시키는 스트레스 요인을 함께 파악하고, 침 치료로 과긴장된 근육과 신경을 이완합니다.",
+                      regen: "심신 안정 작용의 스포츠한약(도핑프리)과 멘탈 향기치료를 병행하여 긴장도를 낮춥니다.",
+                      strength: "심리상담사와 함께 스트레스 관리 방법을 익히며 훈련·시합 환경을 단계적으로 조정합니다."
+                  }) 
+                },
+                { id: 'y3-7', cat: 'y3', title: "ADHD", subtitle: "집중력 저하와 충동성 관리", tag: "멘탈/집중력", 
+                  content: mHTML({
+                      summary: "주의 집중을 유지하기 어렵거나 충동적인 행동, 과잉 활동이 나타나 훈련 지시 이행이나 경기 중 판단에 영향을 줄 수 있는 상태입니다. 정확한 평가와 관리가 중요합니다.",
+                      symptoms: ["훈련 지시를 끝까지 듣지 못하고 자주 딴 생각에 빠짐", "충동적으로 행동하거나 순서를 기다리기 어려워함"],
+                      redSign: "",
+                      acute: "소아과 전문의 진단을 통해 상태를 객관적으로 평가하고 훈련 환경 조정 방향을 제시합니다.",
+                      regen: "집중력과 정서 조절을 돕는 맞춤 스포츠한약(도핑프리)을 처방합니다.",
+                      strength: "심리상담사와의 정기 상담으로 자기조절 훈련을 병행하여 훈련 몰입도를 높입니다."
+                  }) 
+                },
+                { id: 'y3-8', cat: 'y3', title: "알러지비염", subtitle: "코호흡을 막는 반복된 염증", tag: "내과/호흡기", 
+                  content: mHTML({
+                      summary: "콧속 점막이 꽃가루, 먼지 등에 과민 반응하여 코막힘, 재채기, 콧물이 반복되는 상태입니다. 코호흡이 어려워지면 유산소 운동 능력과 수면의 질에도 영향을 줍니다.",
+                      symptoms: ["운동 중 코막힘으로 입으로만 호흡하게 됨", "아침저녁으로 심한 재채기와 맑은 콧물이 반복됨"],
+                      redSign: "",
+                      acute: "체질 및 증상 패턴을 진단하여 코막힘을 빠르게 완화하는 침 치료를 시행합니다.",
+                      regen: "비염 체질을 개선하는 스포츠한약(도핑프리)을 처방하여 점막 과민성을 낮춥니다.",
+                      strength: "면역력과 호흡 효율을 함께 관리하여 훈련 중 호흡 부담을 줄여줍니다."
+                  }) 
+                },
+                { id: 'y3-9', cat: 'y3', title: "천식 (운동유발성 천식)", subtitle: "격렬한 운동 중 좁아지는 기관지", tag: "내과/호흡기", 
+                  content: mHTML({
+                      summary: "찬 공기나 격렬한 운동 중 기관지가 과민하게 수축하여 숨쉬기 힘들어지는 상태입니다. 특히 유산소 지구력이 필요한 종목의 유소년 선수에서 퍼포먼스 저하의 원인이 될 수 있습니다.",
+                      symptoms: ["운동 시작 후 몇 분 뒤부터 기침, 가슴 답답함이 나타남", "찬 공기에서 운동할 때 숨소리가 거칠어지고 호흡이 힘듦"],
+                      redSign: "입술이 파랗게 변하거나 숨쉬기가 심하게 힘들 때는 즉시 병원 진료가 필요합니다",
+                      acute: "증상 패턴을 확인하고, 기관지를 편안하게 하는 침 치료를 병행합니다.",
+                      regen: "기관지 점막을 튼튼하게 하는 스포츠한약(도핑프리)으로 체질을 개선합니다.",
+                      strength: "종목별 워밍업 루틴 조정과 함께 지구력 훈련 강도를 단계적으로 관리합니다."
+                  }) 
+                }
+            ]
+        },
+        adult: {
+            desc: { title: "객관적 진단, 바른 치료 💡", text: "지속되는 척추/관절 통증, 동호인 스포츠 손상, 수술 후 재활까지. 초음파와 체형 분석으로 원인을 찾고, 조직 회복 주기에 맞춘 침, 약침, 고주파 등 체계적인 한의학 치료를 제공합니다." },
+            categories: [
+                { id: 'a1', title: '정밀 진단 시스템' },
+                { id: 'a2', title: '맞춤형 특화 치료' },
+                { id: 'a3', title: '체형 및 구조 회복' }
+            ],
+            chapters: [
+                { id: 'a1-1', cat: 'a1', title: "초음파 구조 진단 (RMSK)", subtitle: "인대와 힘줄의 숨은 1mm 손상 찾기", tag: "객관적 진단", 
+                  content: mHTML({
+                      summary: "엑스레이로 보이지 않는 근육, 힘줄, 인대, 점액낭의 상태를 실시간 영상으로 확인하는 정밀 검사입니다.",
+                      symptoms: ["MRI를 찍기엔 부담스럽고 엑스레이엔 이상이 없다 할 때", "관절을 움직일 때만 통증이나 마찰음이 발생할 때"],
+                      redSign: "",
+                      acute: "미국 초음파 자격(RMSK) 의료진이 초음파 동적 스캔을 통해 파열, 염증, 혈관절증(피고임) 유무를 즉각 판별합니다.",
+                      regen: "영상 유도하에 오차 없이 손상 부위를 타겟팅하여 재생 약침과 고주파를 시술합니다.",
+                      strength: "조직이 얼마나 차올랐는지 초음파 추적 관찰을 통해 훈련(일상) 복귀 시점을 안전하게 결정합니다."
+                  }) 
+                },
+                { id: 'a1-2', cat: 'a1', title: "BWA 체성분 및 수분 밸런스", subtitle: "세포 건강도와 국소 부종 파악", tag: "기능 진단", 
+                  content: mHTML({
+                      summary: "단순 비만도 검사가 아닙니다. 세포 내외의 수분 비율과 위상각(Phase angle)을 측정하여 조직 활성도와 붓기를 평가합니다.",
+                      symptoms: ["수술 후 혹은 만성적인 부종이 빠지지 않을 때", "컨디션 저하가 눈에 띄게 나타날 때"],
+                      redSign: "",
+                      acute: "부종 수치를 확인하여 어혈 배출을 위한 습식 부항(사혈)의 근거로 삼습니다.",
+                      regen: "측정된 세포 건강도를 바탕으로 회복 영양을 공급하는 맞춤 한약을 처방합니다.",
+                      strength: "수분 밸런스 모니터링을 통해 근육량 회복 및 퍼포먼스 향상도를 측정합니다."
+                  }) 
+                },
+                { id: 'a2-1', cat: 'a2', title: "초음파 유도하 약침/도침", subtitle: "안전하고 정확한 재생과 유착 박리", tag: "약침 요법", 
+                  content: mHTML({
+                      summary: "한약재 추출 성분을 통증 부위에 직접 주입하거나, 특수 침(도침)으로 만성 유착을 풀어냅니다.",
+                      symptoms: ["국소 부위의 낫지 않는 염증과 붓기", "신경이 단단한 인대 조직에 눌린 포착 증후군"],
+                      redSign: "",
+                      acute: "어혈 약침을 사용하여 급성 염좌 시 뭉친 피와 화학적 염증을 씻어냅니다.",
+                      regen: "자하거(태반) 약침으로 연골 및 인대에 재생 필수 영양분을 강력히 공급합니다.",
+                      strength: "초음파 가이드 도침술을 통해 오랜 기간 눌리고 유착된 근막 조직을 미세 박리합니다."
+                  }) 
+                },
+                { id: 'a2-2', cat: 'a2', title: "심부 고주파(TECAR) 및 자기장", subtitle: "조직 깊숙한 재생 에너지", tag: "물리/온열", 
+                  content: mHTML({
+                      summary: "혈관이 부족해 잘 낫지 않는 인대 깊숙한 곳까지 열과 자기장 에너지를 전달해 세포 재생을 촉진합니다.",
+                      symptoms: ["만성적인 팔꿈치 통증 (엘보)", "어깨가 굳어 안 올라가는 오십견"],
+                      redSign: "",
+                      acute: "부드러운 저강도 자기장 치료로 손상 부위 세포의 급성 스트레스를 완화합니다.",
+                      regen: "TECAR 고주파를 통해 조직 내 혈류량을 인위적으로 폭발시켜 힘줄 재생을 강제합니다.",
+                      strength: "고강도 심부 자기장으로 신경과 근육의 피드백 기능을 자극하여 근력을 회복합니다."
+                  }) 
+                },
+                { id: 'a2-3', cat: 'a2', title: "무통 전침 및 전기뜸", subtitle: "혈류 순환의 극대화", tag: "침구 치료", 
+                  content: mHTML({
+                      summary: "기본 침 치료에 미세한 전기 자극을 더해 굳은 근육을 펌핑시키고, 온열 뜸 효과로 혈관을 확장시킵니다.",
+                      symptoms: ["깊숙이 뭉친 만성 근육통", "신경 눌림이나 위축으로 인한 힘 빠짐 증상"],
+                      redSign: "",
+                      acute: "초음파 가이드 침으로 통증 유발점을 찔러 급성 근육 경련을 즉시 해소합니다.",
+                      regen: "전침의 규칙적인 수축 이완 작용으로 손상 부위 주변의 피로 물질을 씻어냅니다.",
+                      strength: "전기뜸의 온열 효과로 만성 부위의 혈관을 확장시켜 굳어가는 조직을 부드럽게 유지합니다."
+                  }) 
+                },
+                { id: 'a3-1', cat: 'a3', title: "해온 스포츠 교정 추나", subtitle: "비뚤어진 뼈대와 근막 이완", tag: "추나 요법", 
+                  content: mHTML({
+                      summary: "우두둑 뼈를 꺾지 않고, 환자의 호흡과 근육 저항을 활용하는 근에너지기법(MET)으로 정렬을 맞춥니다.",
+                      symptoms: ["거북목, 라운드숄더로 인한 만성 통증", "골반 비대칭으로 인한 짝다리와 요통"],
+                      redSign: "",
+                      acute: "급성기에는 염증 부위 직접 압박을 피하고 주변부 근막만 가볍게 수기 이완합니다.",
+                      regen: "관절 가동 범위를 점진적으로 늘려주며 틀어진 뼈대와 짧아진 근막을 교정합니다.",
+                      strength: "신체 밸런스를 바로잡은 상태에서 코어 안정화 운동을 병행하여 바른 구조를 고정시킵니다."
+                  }) 
+                },
+                { id: 'a3-2', cat: 'a3', title: "JW 스포츠밸런스테이핑", subtitle: "관절의 갑옷이자 순환 펌프", tag: "테이핑", 
+                  content: mHTML({
+                      summary: "관절을 완전히 묶는 깁스와 달리, 근육 결을 따라 탄력 테이프를 부착해 지지력을 높이고 림프 순환을 돕습니다.",
+                      symptoms: ["훈련/운동 중 잦은 삐끗함(불안정증)", "부상 부위의 운동 후 지속적인 붓기"],
+                      redSign: "",
+                      acute: "손상 직후 붓기를 빼고 관절이 더 이상 꺾이지 않도록 강력하게 고정 테이핑합니다.",
+                      regen: "근육의 결을 따라 부착하여 림프 순환을 돕고 조직 회복을 간접 지원합니다.",
+                      strength: "일상 및 운동 복귀 시 2차 부상을 막는 보조기 역할과 퍼포먼스 향상을 위해 사용합니다."
+                  }) 
+                }
+            ]
+        },
+        encyc: {
+            desc: { title: "해온 통증 질환 백과사전 📖", text: "머리부터 발끝까지, 일상 및 스포츠 현장에서 발생하는 약 40여 가지 주요 근골격계 질환의 증상과 객관적 한의학 치료 가이드를 집대성했습니다." },
+            categories: [
+                { id: 'e1', title: '목 · 어깨' },
+                { id: 'e2', title: '허리 · 골반' },
+                { id: 'e3', title: '팔꿈치 · 손목' },
+                { id: 'e4', title: '무릎 · 하체' },
+                { id: 'e5', title: '발 · 발목' },
+                { id: 'e6', title: '신경계 · 기타' }
+            ],
+            chapters: [
+                { id: 'e1-1', cat: 'e1', title: "01. 거북목 및 일자목 증후군", subtitle: "잃어버린 경추 곡선과 만성 피로", tag: "목", 
+                  content: mHTML({
+                      summary: "머리가 몸통보다 앞으로 빠져 목과 등 상부 근육이 머리 무게를 버티느라 돌처럼 굳어지는 상태입니다.",
+                      symptoms: ["목덜미와 양어깨가 항상 무겁고 뻐근함", "오래 앉아있으면 뒷골이 당기고 안구 피로/두통 발생"],
+                      redSign: "",
+                      acute: "사혈부항과 전침으로 굳은 후두하근과 승모근의 급성 긴장과 어혈을 해소합니다.",
+                      regen: "초음파 가이드 약침으로 미세 염증을 치료하고 약해진 경추 주변 인대를 회복합니다.",
+                      strength: "스포츠 추나로 굽은 등(흉추)을 펴고 경추 배열을 바로잡아 재발을 근본 방지합니다."
+                  }) 
+                },
+                { id: 'e1-2', cat: 'e1', title: "02. 목 디스크 (경추 신경근병증)", subtitle: "신경 압박으로 인한 팔/손 저림", tag: "목", 
+                  content: mHTML({
+                      summary: "경추 디스크가 밀려나와 어깨와 팔로 가는 신경을 누르고 화학적 염증을 일으키는 질환입니다.",
+                      symptoms: ["목 통증보다 팔과 손가락을 따라 찌릿한 방사통이 더 심함", "고개를 뒤로 젖히거나 아픈 쪽으로 돌릴 때 통증 악화"],
+                      redSign: "팔/손의 근력이 급격히 빠지거나 단추 채우기가 어려울 때",
+                      acute: "초음파 가이드 약침으로 신경 뿌리의 붓기와 강력한 화학적 염증을 씻어냅니다.",
+                      regen: "감압 견인 추나로 척추 사이 공간을 미세하게 열어 신경 압박을 물리적으로 줄입니다.",
+                      strength: "경추부 심부 근육(코어)을 강화하는 침구 치료와 자세 교정으로 척추 안정성을 높입니다."
+                  }) 
+                },
+                { id: 'e1-3', cat: 'e1', title: "03. 오십견 (유착성 관절낭염)", subtitle: "타인이 올려도 안 올라가는 굳은 어깨", tag: "어깨", 
+                  content: mHTML({
+                      summary: "어깨 관절을 감싸는 주머니(관절낭)가 두꺼워지고 쪼그라들어 뼈에 들러붙은 극심한 통증 질환입니다.",
+                      symptoms: ["머리 빗기, 등 뒤로 손 올리기 불가", "남이 팔을 억지로 올려주려 해도 굳어서 안 올라감", "밤에 심해지는 야간통"],
+                      redSign: "어깨 부위에 열이 나고 붉게 부어오를 때 (감염성 감별)",
+                      acute: "통증이 극심한 동결기에는 무리한 스트레칭을 피하고 진통 위주의 약침 치료를 합니다.",
+                      regen: "심부 고주파(TECAR)로 유착되어 쪼그라든 관절낭을 버터처럼 부드럽게 녹여냅니다.",
+                      strength: "초음파 가이드 도침과 관절 가동 수기요법으로 가동 범위를 점진적으로 늘려갑니다."
+                  }) 
+                },
+                { id: 'e1-4', cat: 'e1', title: "04. 회전근개 파열 및 충돌증후군", subtitle: "특정 각도에서 예리하게 걸리는 어깨 통증", tag: "어깨", 
+                  content: mHTML({
+                      summary: "어깨를 움직이는 4개의 힘줄이 어깨 천장뼈와 충돌해 마모되거나 파열된 스포츠/퇴행성 손상입니다.",
+                      symptoms: ["팔을 옆으로 들 때 60~120도 구간에서 날카로운 통증", "팔을 들다 힘이 빠져 툭 떨어뜨리게 됨"],
+                      redSign: "외상 직후 팔을 전혀 위로 들지 못할 때 (완전 파열 의심)",
+                      acute: "초음파 진단으로 파열 정도를 확인하고 극저온 치료로 급성 염증과 부종을 제어합니다.",
+                      regen: "부분 파열의 경우 자하거 약침을 손상된 힘줄에 주입하여 조직 재생을 촉진합니다.",
+                      strength: "어깨 공간을 좁히는 라운드숄더를 추나로 교정하고 견갑골 안정화 운동을 병행합니다."
+                  }) 
+                },
+                { id: 'e1-5', cat: 'e1', title: "05. 긴장성 두통 & 흉곽출구증후군", subtitle: "근육 경직이 부르는 신경 포착", tag: "목/신경", 
+                  content: mHTML({
+                      summary: "스트레스로 목 근육이 굳어 머리를 조이거나(두통), 목 앞쪽 근육이 팔 신경을 누르는(흉곽출구) 질환입니다.",
+                      symptoms: ["머리에 꽉 끼는 밴드를 두른 듯한 압박감", "팔을 머리 위로 들고 자면 손 저림이 심해짐"],
+                      redSign: "",
+                      acute: "사혈 부항을 통해 뒷목과 어깨에 누적된 어혈과 근막의 높은 압력을 즉시 낮춥니다.",
+                      regen: "목 앞쪽 핵심 근육(사각근, 흉쇄유돌근)의 심부 유착을 침과 고주파로 깊숙이 이완시킵니다.",
+                      strength: "잘못된 흉식 호흡 패턴과 거북목 자세를 교정하여 신경 압박의 원인을 제거합니다."
+                  }) 
+                },
+                { id: 'e1-6', cat: 'e1', title: "06. 목 염좌 (낙침) & 석회화건염", subtitle: "자고 일어났을 때, 혹은 응급실 갈 정도의 통증", tag: "급성 통증", 
+                  content: mHTML({
+                      summary: "목이 안 돌아가거나(낙침), 어깨 힘줄에 칼슘(석회)이 쌓여 화학적 폭발을 일으키는(석회화건염) 상태입니다.",
+                      symptoms: ["아침에 목을 한쪽으로 전혀 돌릴 수 없음 (낙침)", "어깨가 찢어질 듯 아파 응급실을 찾게 됨 (석회화)"],
+                      redSign: "열이 나고 관절이 붉게 부어오를 때",
+                      acute: "낙침의 급성 근육 경련은 습식 부항과 전침으로 피를 빼내어 즉시 경직을 풉니다.",
+                      regen: "석회화건염은 초음파 가이드 봉약침으로 면역 대식세포를 불러모아 석회 흡수를 유도합니다.",
+                      strength: "염증 소실 후 관절 주변 혈류량을 높이는 심부 자기장 치료로 기능 장애를 막습니다."
+                  }) 
+                },
+                { id: 'e2-1', cat: 'e2', title: "07. 급성 요추 염좌", subtitle: "허리를 삐끗한 직후의 극심한 통증", tag: "허리", 
+                  content: mHTML({
+                      summary: "무거운 물건을 들거나 갑자기 방향을 틀 때 허리 근육과 인대가 미세 파열된 상태입니다.",
+                      symptoms: ["허리를 펴거나 숙이기 힘들고 기침 시 울림", "골반 부근까지 근육이 단단하게 경직됨"],
+                      redSign: "대소변 조절 장애나 다리 힘 빠짐이 동반될 때",
+                      acute: "어혈 약침과 습식 부항(사혈)으로 허리에 발생한 붓기와 멍든 피를 빼는 것이 핵심입니다.",
+                      regen: "냉각 치료 후 가벼운 침 치료로 경직된 다열근과 기립근의 부드러운 이완을 돕습니다.",
+                      strength: "급성 통증 소실 후 골반 교정 추나를 통해 척추의 밸런스를 원래대로 되돌립니다."
+                  }) 
+                },
+                { id: 'e2-2', cat: 'e2', title: "08. 허리 디스크 (추간판 탈출증)", subtitle: "엉덩이부터 발끝까지 찌릿한 방사통", tag: "허리", 
+                  content: mHTML({
+                      summary: "허리 뼈 사이 수핵이 밀려나와 다리로 가는 척추 신경을 압박하고 염증을 일으킵니다.",
+                      symptoms: ["허리보다 엉덩이, 허벅지 뒤, 종아리 저림이 심함", "허리를 앞으로 숙일 때 다리 당김 악화"],
+                      redSign: "발목이나 발가락을 위로 들어올리는 힘이 현저히 빠질 때 (풋드랍)",
+                      acute: "초음파 가이드 약침으로 밀려나온 디스크 주변의 강한 화학적 신경 염증을 씻어냅니다.",
+                      regen: "골반 및 요추 견인 추나로 디스크가 받을 압력을 물리적으로 부드럽게 줄여줍니다.",
+                      strength: "신경재생을 돕는 한약 처방과 코어 근력 운동 지도로 척추 자생력을 확보합니다."
+                  }) 
+                },
+                { id: 'e2-3', cat: 'e2', title: "09. 척추관 협착증", subtitle: "걷다 쉬다를 반복하는 파행증", tag: "허리", 
+                  content: mHTML({
+                      summary: "노화로 인해 인대와 뼈가 두꺼워져 척추 신경이 지나는 좁은 터널(척추관)이 꽉 막힌 퇴행성 질환입니다.",
+                      symptoms: ["조금만 걸어도 다리가 터질 듯 아파 쉬어야 함", "허리를 앞으로 숙이면 통증이 오히려 완화됨"],
+                      redSign: "휴식 중에도 극심한 다리 통증이 가라앉지 않을 때",
+                      acute: "급성 염증기에는 신경 통로 주변의 붓기를 가라앉히는 소염 약침을 주입합니다.",
+                      regen: "자음보신(滋陰補腎) 한약으로 척추 영양을 채우고 온열 뜸으로 굳은 혈관을 확장합니다.",
+                      strength: "초음파 가이드 도침 요법으로 두꺼워진 황색인대 주변 유착을 풀어 보행 거리를 늘립니다."
+                  }) 
+                },
+                { id: 'e2-4', cat: 'e2', title: "10. 골반통 (천장관절 증후군)", subtitle: "엉치뼈와 골반뼈가 만나는 부위의 깊은 통증", tag: "골반", 
+                  content: mHTML({
+                      summary: "골반을 지탱하는 인대가 약해지거나 비대칭적 부하로 인해 꼬리뼈/엉덩이 관절에 염증이 생겼습니다.",
+                      symptoms: ["아침에 일어날 때, 양반다리 할 때, 돌아누울 때 골반 통증", "허리 디스크로 오인하기 쉬운 엉덩이 집중 통증"],
+                      redSign: "",
+                      acute: "관절면에 발생한 마찰 열과 급성 염증을 약침과 이온쿨러 찜질로 제어합니다.",
+                      regen: "골반의 비대칭적 회전을 바르게 맞추는 수기 교정 추나요법을 중점적으로 실시합니다.",
+                      strength: "느슨해진 천장관절 주변 인대를 다잡는 초음파 가이드 인대 강화 약침을 주입합니다."
+                  }) 
+                },
+                { id: 'e2-5', cat: 'e2', title: "11. 좌골신경통 & 척추전방전위증", subtitle: "근육에 눌린 신경과 어긋난 척추뼈", tag: "골반/허리", 
+                  content: mHTML({
+                      summary: "엉덩이 근육이 굳어 다리 신경을 누르거나(좌골신경통), 척추뼈가 앞으로 미끄러져 어긋난(전방전위증) 상태입니다.",
+                      symptoms: ["엉덩이 환도 부위를 누르면 몹시 아프고 저림 (좌골)", "허리를 뒤로 젖힐 때 뼈가 어긋나며 심한 통증 (전방전위)"],
+                      redSign: "",
+                      acute: "좌골신경통은 장침과 고주파로 다리로 가는 신경을 누르는 두꺼운 이상근 심부를 이완합니다.",
+                      regen: "신경 안정 약침을 통해 압박받아 예민해진 신경망의 회복을 촉진합니다.",
+                      strength: "전방전위증은 무리한 교정을 피하고 스포츠밸런스테이핑으로 코어를 강화하여 뼈를 지탱합니다."
+                  }) 
+                },
+                { id: 'e3-1', cat: 'e3', title: "12. 테니스 / 골프 엘보", subtitle: "팔꿈치 뼈 부착부 힘줄의 미세 파열", tag: "팔꿈치", 
+                  content: mHTML({
+                      summary: "손목을 반복 사용해 근육이 팔꿈치 뼈에 붙는 지점(힘줄)이 너덜너덜해진 과사용 손상입니다.",
+                      symptoms: ["물건을 쥐거나 비틀어 짤 때 팔꿈치 바깥(테니스)/안쪽(골프) 찌릿함", "문고리를 돌리거나 가벼운 컵을 들 때도 통증 발생"],
+                      redSign: "팔꿈치가 완전히 펴지지 않고 관절이 잠길 때",
+                      acute: "힘줄 부착부에 발생한 붓기와 미세 파열 염증을 초음파 가이드 약침으로 진정시킵니다.",
+                      regen: "가열식 화침(전기뜸)과 심부 고주파(TECAR)로 인위적인 혈류를 폭발시켜 힘줄 재생을 강제합니다.",
+                      strength: "전완근(팔뚝) 근막 이완 및 테이핑을 통해 팔꿈치 힘줄이 받는 인장력을 분산시킵니다."
+                  }) 
+                },
+                { id: 'e3-2', cat: 'e3', title: "13. 손목터널증후군 (수근관)", subtitle: "손목 인대가 두꺼워져 신경을 조이는 병", tag: "손목", 
+                  content: mHTML({
+                      summary: "손목 앞쪽 통로를 덮는 횡수근 인대가 비후되어 그 밑을 지나는 정중신경을 압박합니다.",
+                      symptoms: ["엄지~중지 손가락 끝 저림, 밤에 심해져 손을 털며 깸", "아침에 손이 붓고 뻣뻣한 느낌"],
+                      redSign: "엄지손가락 밑 두툼한 근육이 납작하게 말라붙을 때 (근위축)",
+                      acute: "수근관 내부의 붓기와 화학적 압력을 낮추는 소염 약침을 신경망 주변에 주입합니다.",
+                      regen: "초음파 가이드 도침 시술로 두꺼워진 인대를 미세하게 박리하여 공간을 확보합니다.",
+                      strength: "눌린 신경을 자극하는 전침 치료를 병행하며, 야간 수면 시 손목 보호대 착용을 지도합니다."
+                  }) 
+                },
+                { id: 'e3-3', cat: 'e3', title: "14. 방아쇠수지 & 드퀘르벵 건초염", subtitle: "손가락과 손목 힘줄 통로의 뻑뻑한 마찰", tag: "손목/손", 
+                  content: mHTML({
+                      summary: "힘줄을 싸고 있는 막(건초)이 부어올라 힘줄이 매끄럽게 통과하지 못하고 덜컥 걸리는 질환입니다.",
+                      symptoms: ["손가락을 굽힐 때 '딸깍' 걸리는 현상 (방아쇠)", "엄지를 감싸 쥐고 아래로 꺾을 때 손목 통증 (드퀘르벵)"],
+                      redSign: "손가락이 아예 굽혀진 채 펴지지 않을 때 (잠김 현상)",
+                      acute: "초음파로 건초 내 물참(삼출액)을 확인하고, 냉찜질과 소염 약침으로 붓기를 뺍니다.",
+                      regen: "염증 부위를 정확히 타겟팅하는 침 치료로 마찰을 줄이고 건초 유연성을 회복합니다.",
+                      strength: "만성화되어 굳어버린 결절 부위는 도침으로 긁어내어 뻑뻑한 유착을 완전히 해소합니다."
+                  }) 
+                },
+                { id: 'e3-4', cat: 'e3', title: "15. TFCC 손상 & 주관증후군", subtitle: "손목 연골 파열과 팔꿈치 신경 눌림", tag: "팔/손목", 
+                  content: mHTML({
+                      summary: "넘어져 새끼손가락 쪽 연골이 찢어지거나(TFCC), 팔꿈치 터널에서 척골신경이 눌린(주관증후군) 질환입니다.",
+                      symptoms: ["바닥 짚고 일어날 때 새끼 쪽 손목 욱신거림 (TFCC)", "약지와 새끼손가락 라인만 유독 저림 (주관증후군)"],
+                      redSign: "",
+                      acute: "TFCC 손상 초기는 절대적인 깁스/고정 테이핑과 냉각 치료로 추가 파열을 막아야 합니다.",
+                      regen: "혈관이 적은 연골 부위에 자하거(태반) 약침을 투여하여 재생에 필요한 영양을 공급합니다.",
+                      strength: "주관증후군은 팔꿈치 근막 이완 침치료와 함께 수면 시 팔 굽힘 방지 교육을 시행합니다."
+                  }) 
+                },
+                { id: 'e4-1', cat: 'e4', title: "16. 퇴행성 무릎 관절염", subtitle: "연골 마모와 관절 전체의 퇴행", tag: "무릎", 
+                  content: mHTML({
+                      summary: "노화나 장기간 스포츠 활동으로 무릎 연골이 닳고 주변 뼈와 활막에 만성 염증이 생겼습니다.",
+                      symptoms: ["계단 내려갈 때 시큰거림과 붓기", "아침에 뻣뻣하다가 활동하면 조금 나아짐"],
+                      redSign: "관절이 심하게 부어 오르며 만지면 뜨겁고 붉을 때",
+                      acute: "관절 내 활액포에 발생한 염증과 삼출액(물참)을 봉약침이나 소염 약침으로 가라앉힙니다.",
+                      regen: "초음파 가이드 자하거 약침으로 관절 내 윤활 성분을 보충하고 연골 마찰을 부드럽게 줄입니다.",
+                      strength: "대퇴사두근 강화 전침 및 운동 재활로 무릎 뼈가 받는 하중을 근육이 대신하게 합니다."
+                  }) 
+                },
+                { id: 'e4-2', cat: 'e4', title: "17. 십자인대(ACL) & 반월상연골 파열", subtitle: "방향 전환, 착지 시 무릎 꺾임 손상", tag: "무릎 스포츠", 
+                  content: mHTML({
+                      summary: "스포츠 활동 중 무릎이 강하게 비틀리며 인대가 끊어지거나 쿠션(연골)이 찢어진 심각한 손상입니다.",
+                      symptoms: ["다치는 순간 '뚝' 파열음과 함께 심하게 붓고 걷기 힘듦", "무릎이 자꾸 빠질 것 같은 불안정감 지속"],
+                      redSign: "무릎이 잠겨서 아예 펴지지 않거나 지속적으로 덜렁거릴 때",
+                      acute: "초음파 진단으로 혈관절증(피 고임)을 파악하고 이온쿨러와 사혈 부항으로 응급 붓기를 뺍니다.",
+                      regen: "수술 여부와 관계없이 약침과 고주파 치료로 손상 조직 주변 재생 혈류를 촉진합니다.",
+                      strength: "장기간 고정으로 인한 대퇴근 위축을 막는 전침 재활과 밸런스 훈련을 중점적으로 합니다."
+                  }) 
+                },
+                { id: 'e4-3', cat: 'e4', title: "18. 슬개건염 & 장경인대 증후군", subtitle: "러닝과 점프를 사랑하는 사람들의 무릎 통증", tag: "무릎 스포츠", 
+                  content: mHTML({
+                      summary: "특정 동작 반복으로 무릎 앞(슬개건)이나 바깥쪽(장경인대) 뼈와 힘줄이 마찰되어 염증이 발생합니다.",
+                      symptoms: ["점프 착지 시 무릎 덮개뼈 밑 통증 (점퍼스니)", "달리기 3km 지점부터 무릎 바깥쪽 화끈거림 (러너스니)"],
+                      redSign: "",
+                      acute: "마찰로 인해 발생한 부착부 염증을 이온쿨러 극저온 요법과 약침으로 빠르게 소염시킵니다.",
+                      regen: "골반부터 무릎까지 이어진 허벅지 근막의 과긴장을 초음파 가이드 침과 추나로 깊게 이완합니다.",
+                      strength: "장경인대 폼롤러 스트레칭 교육과 슬개골 테이핑을 통해 구조적 마찰을 근본 방지합니다."
+                  }) 
+                },
+                { id: 'e4-4', cat: 'e4', title: "19. 햄스트링 & 종아리(비복근) 파열", subtitle: "전력 질주 중 뚝 끊어지는 하체 근육 파열", tag: "하체 근육", 
+                  content: mHTML({
+                      summary: "순간적인 스프린트나 킥 동작에서 허벅지 뒤쪽(햄스트링)이나 종아리 근육 섬유가 찢어진 손상입니다.",
+                      symptoms: ["갑자기 뒤에서 돌을 던져 맞은 듯한 퍽! 충격", "광범위하게 시퍼런 멍이 들고 걷기 불가능"],
+                      redSign: "파열된 부위 근육이 눈에 띄게 움푹 패여 있을 때 (완전 파열)",
+                      acute: "파열 직후 사혈 부항으로 내부 혈종(피고임)을 빼야 근육이 질긴 흉터 없이 예쁘게 재생됩니다.",
+                      regen: "자기장과 고주파 치료를 염증 부위에 조사하여 찢어진 근섬유 회복 속도를 끌어올립니다.",
+                      strength: "통증 없는 범위 내에서 근수축 등척성 운동을 지도하여 근육 길이를 원래대로 회복시킵니다."
+                  }) 
+                },
+                { id: 'e4-5', cat: 'e4', title: "20. 거위발건염 & 슬개대퇴통증(PFPS)", subtitle: "무릎 안쪽 붓기와 무릎 앞 시큰거림", tag: "무릎 기타", 
+                  content: mHTML({
+                      summary: "무릎 안쪽 점액낭 염증(거위발건염)과 무릎 덮개뼈가 엇나가는 통증(PFPS)입니다.",
+                      symptoms: ["무릎 안쪽 5cm 아래 볼록한 붓기와 통증 (거위발)", "계단 오를 때 무릎 앞쪽 전반의 뻐근함 (PFPS)"],
+                      redSign: "",
+                      acute: "거위발건염의 물찬 점액낭은 초음파 가이드 약침으로 붓기를 가라앉히고 마찰 열을 식힙니다.",
+                      regen: "무릎 덮개뼈(슬개골)가 바깥으로 엇나가지 않도록 주변 근육의 긴장 밸런스를 침 치료로 맞춥니다.",
+                      strength: "VMO(내측광근) 강화 운동과 무릎 추나 교정을 통해 뼈가 제 길을 따라 움직이도록 구조를 잡습니다."
+                  }) 
+                },
+                { id: 'e5-1', cat: 'e5', title: "21. 급성 발목 염좌 & 만성 불안정증", subtitle: "접질린 발목, 대충 넘기면 평생 고생합니다", tag: "발목", 
+                  content: mHTML({
+                      summary: "발목 바깥 인대가 찢어진 손상으로, 제대로 아물지 않으면 계속 삐끗하는 '불안정증'이 됩니다.",
+                      symptoms: ["복숭아뼈 주변 심한 붓기와 멍", "울퉁불퉁한 길만 걸어도 발목이 쉽게 덜렁거리고 꺾임"],
+                      redSign: "복숭아뼈 자체를 눌렀을 때 뼛속 깊이 찌릿한 극심한 통증 (골절 의심)",
+                      acute: "초기 코끼리 다리 같은 붓기를 이온쿨러와 사혈 부항으로 응급 제어하고 테이핑 고정합니다.",
+                      regen: "늘어난 인대가 헐렁하게 붙지 않도록 초음파 가이드 인대 강화 약침을 정밀 주입합니다.",
+                      strength: "발목 밸런스 회복 훈련(고유수용감각)을 통해 습관적인 만성 불안정증을 완벽히 차단합니다."
+                  }) 
+                },
+                { id: 'e5-2', cat: 'e5', title: "22. 아킬레스건염 & 세버병", subtitle: "발뒤꿈치 뼈에 붙는 굵은 힘줄의 반란", tag: "발목/발", 
+                  content: mHTML({
+                      summary: "성인은 아킬레스건 자체 미세 파열(염증), 성장기 아이는 발뒤꿈치 성장판의 염증(세버병)입니다.",
+                      symptoms: ["성인: 아침 첫걸음 시 아킬레스건 뻣뻣함", "유소년: 달리기 후 뒤꿈치 누르면 통증, 까치발 보행"],
+                      redSign: "퍽! 소리와 함께 발목을 아래로 젖히지(까치발) 못할 때 (파열)",
+                      acute: "발뒤꿈치 체중 부하를 줄이기 위해 힐패드를 대고, 얼음찜질로 초기 통증을 억제합니다.",
+                      regen: "발바닥부터 종아리로 이어지는 팽팽한 근막 압력을 초음파 가이드 도침과 전침으로 뚝 떨어뜨립니다.",
+                      strength: "종아리 스트레칭 루틴을 통해 아킬레스건이 부드럽게 움직일 여유 공간을 만듭니다."
+                  }) 
+                },
+                { id: 'e5-3', cat: 'e5', title: "23. 족저근막염 & 지방패드 위축", subtitle: "아침 첫 발의 찌릿함과 사라진 발바닥 쿠션", tag: "발바닥", 
+                  content: mHTML({
+                      summary: "발바닥 근막 부착부에 누적된 미세 손상(족저근막염)이나 뒤꿈치 쿠션이 얇아진(지방패드 위축) 질환입니다.",
+                      symptoms: ["아침에 일어나 첫발 디딜 때 뒤꿈치 안쪽 찢어지는 통증", "딱딱한 바닥 맨발 보행 시 뼈가 직접 닿는 듯 쑤심"],
+                      redSign: "발바닥 통증과 함께 전체적인 감각 저하나 화끈거림 동반 시 (신경 문제)",
+                      acute: "근막 부착부의 만성 염증에 소염 약침을 놓아 발을 디딜 수 있게 통증을 우선 제어합니다.",
+                      regen: "퇴행되어 얇아진 족저 조직 주변에 자하거 약침을 투여하여 재생 혈류를 모아줍니다.",
+                      strength: "종아리부터 이어지는 후면 근막 사슬을 수기 추나로 이완하여 충격을 윗단에서 분산시킵니다."
+                  }) 
+                },
+                { id: 'e5-4', cat: 'e5', title: "24. 발목 충돌증후군 & 족근관증후군", subtitle: "발목 앞쪽 찝힘과 복숭아뼈 안쪽 신경 눌림", tag: "발목 기타", 
+                  content: mHTML({
+                      summary: "발목을 젖힐 때 앞쪽 조직이 뼈 사이에 찝히거나(충돌), 안쪽 신경 통로가 좁아져 저린(족근관) 질환입니다.",
+                      symptoms: ["쪼그려 앉을 때 발목 앞쪽이 콱 막히며 아픔 (충돌)", "발 안쪽~발바닥까지 타는 듯 화끈거림 (족근관)"],
+                      redSign: "",
+                      acute: "충돌증후군은 활액막 증식으로 인한 관절 내 붓기를 약침으로 줄여 뼈 사이 공간을 확보합니다.",
+                      regen: "족근관증후군은 좁아진 굴근지대(신경통로)에 신경 안정 약침을 주입하여 염증을 가라앉힙니다.",
+                      strength: "발목 주위 굳은 근육에 전침 치료를 가하여 관절 안팎의 비정상적인 압력을 완전히 해소합니다."
+                  }) 
+                },
+                { id: 'e5-5', cat: 'e5', title: "25. 지간신경종, 무지외반증, 중족골골절", subtitle: "과부하가 만든 발가락/발등 고통", tag: "발가락/발등", 
+                  content: mHTML({
+                      summary: "발가락 사이 신경 비대(지간신경종), 엄지 뼈 변형(무지외반), 발등 뼈 피로골절(중족골)입니다.",
+                      symptoms: ["걸을 때 발바닥 앞쪽 찌릿함/화끈거림 (지간신경종)", "발등 뼈 특정 부위 욱신거림 및 지지 불가 (피로골절)"],
+                      redSign: "",
+                      acute: "지간신경종과 무지외반증은 좁은 신발을 금하고, 테이핑과 침으로 발볼 압력을 넓혀줍니다.",
+                      regen: "신경이 부어오른 곳에 약침을 시술하여 저림을 줄이고 발가락 사이 공간을 부드럽게 이완합니다.",
+                      strength: "피로골절은 뼈를 튼튼히 하는 한약과 심부 자기장 치료를 병행하여 단단한 골유합을 유도합니다."
+                  }) 
+                },
+                { id: 'e6-1', cat: 'e6', title: "26. 안면마비 (구안와사, 벨마비)", subtitle: "초기 3주 골든타임이 평생 후유증을 좌우합니다", tag: "신경 질환", 
+                  content: mHTML({
+                      summary: "스트레스와 과로로 면역력이 떨어졌을 때 바이러스가 뇌신경(7번)에 침투해 한쪽 얼굴이 마비되는 응급 질환입니다.",
+                      symptoms: ["이마에 주름이 안 잡히고 눈이 완전히 감기지 않음", "물을 마실 때 입가로 새고, 발병 전 귀 뒤쪽 통증"],
+                      redSign: "말이 어눌해지거나 팔다리 힘 빠짐, 극심한 어지럼증 동반 시 (뇌졸중 감별)",
+                      acute: "양방 스테로이드 복용과 함께 발병 1일 차부터 매일 한의 치료(약침/침)로 바이러스 염증을 제어합니다.",
+                      regen: "얼굴 근육이 쪼그라들지 않도록 전침 치료를 시행하고, 면역 강화 한약으로 신경 세포를 살립니다.",
+                      strength: "마비가 풀린 후 발생할 수 있는 안면 연합 운동(눈깜빡임과 입꼬리 동시 움직임) 등 후유증을 관리합니다."
+                  }) 
+                },
+                { id: 'e6-2', cat: 'e6', title: "27. 교통사고 후유증 (편타성 손상)", subtitle: "보이지 않는 채찍질 손상과 어혈", tag: "교통사고", 
+                  content: mHTML({
+                      summary: "충돌 시 목과 허리가 채찍처럼 휘청이며 미세 근육과 인대가 다친 상태입니다. 엑스레이에 안 나와도 온몸이 아픕니다.",
+                      symptoms: ["사고 당일보다 2~3일 뒤부터 심해지는 전신 근육통", "두통, 어지럼증, 메스꺼움, 가슴 두근거림, 불면증"],
+                      redSign: "의식 소실, 구토, 극심한 흉통이나 복통 동반 시",
+                      acute: "자동차보험 적용으로 본인 부담 없이, 충격으로 몸속에 뭉친 어혈을 배출하는 당귀수산 한약을 처방합니다.",
+                      regen: "보이지 않는 미세 편타성 손상(목/허리 삠) 부위에 소염 약침과 물리치료를 집중하여 회복시킵니다.",
+                      strength: "추나요법을 통해 충돌 순간 틀어진 척추와 골반을 바르게 교정하여 만성 척추 질환으로의 악화를 막습니다."
+                  }) 
+                }
+            ]
+        }
+    };
+
+    let currentMainTab = 'youth';
+    let charts = {}; 
+
+    // UI State Functions
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        menu.classList.toggle('open');
+    }
+
+    // Floating Quick Menu
+    function toggleFloatingMenu() {
+        document.getElementById('floating-menu').classList.toggle('open');
+    }
+    function closeFloatingMenu() {
+        document.getElementById('floating-menu').classList.remove('open');
+    }
+    function scrollToTopAndClose(e) {
+        if (e) e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        closeFloatingMenu();
+    }
+    document.addEventListener('click', (e) => {
+        const menu = document.getElementById('floating-menu');
+        if (menu && menu.classList.contains('open') && !menu.contains(e.target)) closeFloatingMenu();
+    });
+
+    function scrollToTab(tabType, e) {
+        if (e) e.preventDefault();
+        switchMainTab(tabType);
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const target = document.getElementById('clinic-anchor');
+                const headerOffset = 64;
+                const targetY = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+                window.scrollTo({ top: Math.max(targetY, 0), behavior: 'smooth' });
+            });
+        });
+    }
+
+    function switchMainTab(tabType) {
+        currentMainTab = tabType;
+        const data = DB[tabType];
+        
+        ['youth', 'adult', 'encyc'].forEach(t => {
+            const el = document.getElementById(`mtab-${t}`);
+            el.className = `main-tab flex-1 py-4 text-center text-[15px] text-gray-500 hover:text-brand-primary ${t===tabType?'active':''}`;
+        });
+
+        const descContainer = document.getElementById('tab-desc-container');
+        descContainer.classList.remove('fade-in');
+        void descContainer.offsetWidth; 
+        descContainer.classList.add('fade-in');
+        
+        let headerColor = tabType==='youth' ? 'text-blue-700' : tabType==='adult' ? 'text-green-700' : 'text-gray-800';
+        let badgeColor = tabType==='youth' ? 'bg-blue-50 text-blue-600 border-blue-200' : tabType==='adult' ? 'bg-green-50 text-green-600 border-green-200' : 'bg-gray-100 text-gray-600 border-gray-200';
+        let iconClass = tabType==='youth' ? 'fa-child-reaching text-blue-100' : tabType==='adult' ? 'fa-person-running text-green-100' : 'fa-book-medical text-gray-100';
+
+        descContainer.innerHTML = `
+            <div class="flex-1">
+                <span class="inline-block px-3 py-1 ${badgeColor} text-[11px] font-bold rounded mb-3 uppercase tracking-widest border">${tabType.toUpperCase()} INFO</span>
+                <h2 class="text-xl md:text-2xl font-bold mb-3 leading-snug ${headerColor}">${data.desc.title}</h2>
+                <p class="text-gray-600 text-[14px] leading-relaxed break-keep">${data.desc.text}</p>
+            </div>
+            <div class="hidden md:block text-[80px]"><i class="fa-solid ${iconClass}"></i></div>
+        `;
+
+        renderSubTabs();
+    }
+
+    function renderSubTabs() {
+        const container = document.getElementById('sub-tabs-container');
+        const categories = DB[currentMainTab].categories;
+        let html = '';
+        categories.forEach(cat => {
+            html += `<button onclick="selectCategory('${cat.id}')" id="sub-tab-${cat.id}" class="sub-tab px-4 py-2 bg-white text-gray-500 font-semibold text-[13px] whitespace-nowrap">${cat.title}</button>`;
+        });
+        container.innerHTML = html;
+        if (categories.length > 0) selectCategory(categories[0].id);
+    }
+
+    function selectCategory(catId) {
+        document.querySelectorAll('.sub-tab').forEach(el => {
+            el.className = `sub-tab px-4 py-2 bg-white text-gray-500 font-semibold text-[13px] whitespace-nowrap hover:bg-gray-50`;
+        });
+        
+        const activeTab = document.getElementById(`sub-tab-${catId}`);
+        if(activeTab) {
+            let activeCls = currentMainTab === 'youth' ? 'active-youth' : currentMainTab === 'adult' ? 'active-adult' : 'active-encyc';
+            activeTab.classList.add(activeCls);
+            activeTab.classList.remove('bg-white', 'text-gray-500', 'border-gray-200');
+        }
+        renderChapters(catId);
+    }
+
+    function renderChapters(catId) {
+        const container = document.getElementById('chapter-list-container');
+        const chapters = DB[currentMainTab].chapters.filter(ch => ch.cat === catId);
+        
+        container.classList.remove('fade-in');
+        void container.offsetWidth;
+        container.classList.add('fade-in');
+
+        let html = '';
+        let badgeStyle = currentMainTab==='youth' ? 'bg-blue-50 text-blue-600 border-blue-200' : currentMainTab==='adult' ? 'bg-green-50 text-green-600 border-green-200' : 'bg-gray-100 text-gray-600 border-gray-200';
+        
+        chapters.forEach(ch => {
+            html += `
+            <button onclick="openModal('${ch.id}')" class="bg-white p-5 rounded border border-gray-200 flex flex-col items-start justify-between hover:border-blue-400 hover:shadow-sm transition-all text-left group h-full w-full">
+                <div class="w-full mb-3">
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded inline-block mb-2 border ${badgeStyle}">${ch.tag}</span>
+                    <h3 class="text-[16px] font-bold text-gray-900 mb-1 leading-tight group-hover:text-blue-600 transition-colors">${ch.title}</h3>
+                    <p class="text-[13px] text-gray-500 line-clamp-2 leading-relaxed break-keep">${ch.subtitle}</p>
+                </div>
+                <div class="w-full flex justify-end">
+                    <span class="text-blue-500 text-[12px] font-semibold flex items-center gap-1 group-hover:underline">자세히 보기 <i class="fas fa-chevron-right text-[10px]"></i></span>
+                </div>
+            </button>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function openModal(id) {
+        const chapter = DB[currentMainTab].chapters.find(ch => ch.id === id);
+        if (!chapter) return;
+
+        document.getElementById('modal-tag').textContent = chapter.tag;
+        document.getElementById('modal-title').textContent = chapter.title;
+        document.getElementById('modal-subtitle').textContent = chapter.subtitle;
+        document.getElementById('modal-body').innerHTML = chapter.content;
+
+        document.getElementById('modal-wrapper').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        document.getElementById('modal-wrapper').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // --- STREAMING_CHUNK:Initializing Charts and Intersection Observer... ---
+    function initCharts() {
+        Chart.defaults.font.family = 'Pretendard';
+        Chart.defaults.color = '#475569';
+
+        const ctxM = document.getElementById('chart-mental');
+        if(ctxM) {
+            charts.mental = new Chart(ctxM, {
+                type: 'radar',
+                data: {
+                    labels: ['자신감', '투지', '집중력', '회복탄력성', '조절/불안'],
+                    datasets: [
+                        { label: '기준 평균', data: [80, 80, 80, 80, 80], borderColor: '#cbd5e1', backgroundColor: 'transparent', borderWidth: 1, borderDash: [4, 4], pointRadius: 0 },
+                        { label: '본인 데이터', data: [96, 78, 90, 98, 64], borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', borderWidth: 2, pointBackgroundColor: '#2563eb' }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, 
+                    plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: {size: 11} } } },
+                    scales: { r: { min: 40, max: 100, ticks: { display: false } } }
+                }
+            });
+        }
+
+        const ctxP = document.getElementById('chart-physical');
+        if(ctxP) {
+            charts.physical = new Chart(ctxP, {
+                type: 'bar',
+                data: {
+                    labels: ['W1', 'W2', 'W3', 'W4(현재)'],
+                    datasets: [{
+                        type: 'line', label: '부상위험도', data: [30, 45, 60, 85], borderColor: '#ef4444', borderWidth: 2, tension: 0.3, yAxisID: 'y1'
+                    }, {
+                        type: 'bar', label: '자율신경회복력', data: [80, 65, 50, 25], backgroundColor: '#3b82f6', borderRadius: 2, yAxisID: 'y'
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: { type: 'linear', position: 'left', min: 0, max: 100, title: {display:true, text:'회복력'} },
+                        y1: { type: 'linear', position: 'right', min: 0, max: 100, grid: {drawOnChartArea:false}, title: {display:true, text:'위험도'} }
+                    }
+                }
+            });
+        }
+
+        const ctxG = document.getElementById('chart-growth');
+        if(ctxG) {
+            charts.growth = new Chart(ctxG, {
+                type: 'line',
+                data: {
+                    labels: ['10세', '11세', '12세', '13세', '14세', '15세'],
+                    datasets: [
+                        { label: '표준 성장곡선', data: [138, 144, 151, 159, 166, 171], borderColor: '#94a3b8', borderDash: [4, 4], borderWidth: 1.5, tension: 0.4, pointRadius: 0 },
+                        { label: '예측 곡선', data: [135, 141, 148, 157, 168, 174], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 2, tension: 0.3, fill: true }
+                    ]
+                },
+                options: { 
+                    responsive: true, maintainAspectRatio: false, 
+                    plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: {size: 11} } } },
+                    scales: { x: { grid: { display: false } } } 
+                }
+            });
+        }
+    }
+
+    function init() {
+        new Swiper('.heroSwiper', {
+            loop: true, effect: 'fade', fadeEffect: { crossFade: true }, speed: 1000,
+            autoplay: { delay: 4500, disableOnInteraction: false },
+            pagination: { el: '.swiper-pagination', clickable: true },
+        });
+
+        initCharts();
+        switchMainTab('youth');
+
+        // Scroll Reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.fade-in').forEach(el => {
+            el.classList.remove('fade-in'); el.style.opacity = '0'; observer.observe(el);
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

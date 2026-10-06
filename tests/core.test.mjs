@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import {latestFourInput, completedSessions} from '../core.js';
+const players={a:{name:'Athlete A',diaryNote:'shared diary'},b:{name:'Athlete B'}};
+const records={};
+for(let i=1;i<=5;i++)records['a'+i]={id:'a'+i,playerId:'a',date:`2026-10-0${i}`,note:`note ${i}`};
+records.empty={id:'empty',playerId:'a',date:'2026-10-09',coach:'Coach'};
+records.other={id:'other',playerId:'b',date:'2026-10-10',note:'other athlete'};
+assert.equal(completedSessions(records,'a').length,5);
+assert.deepEqual(latestFourInput(players,records,'a').sessions.map(s=>s.id),['a2','a3','a4','a5']);
+assert.equal(latestFourInput(players,records,'a').player.diaryNote,'shared diary');
+assert.deepEqual(latestFourInput(players,records,'b').sessions.map(s=>s.id),['other']);
+assert.equal(latestFourInput(players,{},'a').sessions.length,0);
+records.a3.date='2026-10-11';
+assert.deepEqual(latestFourInput(players,records,'a').sessions.map(s=>s.id),['a2','a4','a5','a3']);
+console.log('PASS: latest four, empty drafts, athlete isolation, shared diary, changed dates');
+
+const audit={x:{id:'x',playerId:'a',date:'2026-10-03',note:'',noteDeletionHistory:[{text:'삭제 원문은 AI에 보내지 않음'}]}};
+assert.equal(latestFourInput(players,audit,'a').sessions.length,0);
+assert(!JSON.stringify(latestFourInput(players,audit,'a')).includes('삭제 원문'));
+records.a3.deletedAt='2026-10-05T00:00:00Z';
+assert(!completedSessions(records,'a').some(s=>s.id==='a3'));
+assert(!latestFourInput(players,records,'a').sessions.some(s=>s.id==='a3'));
+assert.equal(records.a3.note,'note 3');

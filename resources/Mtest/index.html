@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>유소년선수 스포츠멘탈 테스트 Standard</title>
+
+    <!-- 폰트 적용 (Pretendard) -->
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body { font-family: 'Pretendard', sans-serif; }
+    </style>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 이미지 저장을 위한 html2canvas 라이브러리 추가 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- Import Map: React 및 외부 라이브러리 ESM 로드 -->
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "lucide-react": "https://esm.sh/lucide-react@0.359.0?deps=react@18.2.0",
+        "framer-motion": "https://esm.sh/framer-motion@11.0.8?deps=react@18.2.0,react-dom@18.2.0"
+      }
+    }
+    </script>
+
+    <!-- Babel (JSX 변환용) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link rel="stylesheet" href="../../typography.css" data-basecamp-typography>
+<link rel="stylesheet" href="../report-score-notice.css"><script src="../report-score-notice.js"></script></head>
+<body class="bg-gray-50">
+    <!-- React 앱이 마운트될 루트 요소 -->
+    <div id="root"></div>
+
+    <!-- React 컴포넌트 코드 -->
+    <script type="text/babel" data-type="module">
+        import React, { useState, useMemo, memo, useRef } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { 
+          ChevronRight, Lock, Heart, TrendingUp, Zap, RefreshCw,
+          MinusCircle, Circle, CheckCircle, Smile, Flame, XCircle,
+          Download, Copy, Target, Activity
+        } from 'lucide-react';
+        import { motion, AnimatePresence } from 'framer-motion';
+
+        // --- Constants & Data Structures ---
+
+        const PCDEQ_MAPPING = {
+          1: { name: "경기 긴장 관리", items: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16], reverse: true },
+          2: { name: "주변 지원 환경", items: [17,18,22,25,12], reverse: true },
+          3: { name: "경기 준비 능력", items: [26,27,28,29,30,31,32,33,34,35,36,37,38], reverse: false },
+          4: { name: "실수 후 회복력", items: [39,40,41,42,43,44,45], reverse: true },
+          5: { name: "집중 자기조절력", items: [46,47,48,49,50,51], reverse: true }
+        };
+
+        const EXTRA_INDICES = [
+          { id: 'stability', name: '경기 안정성 지수', items: [5, 8, 9, 11, 15, 16], reverse: true },
+          { id: 'psychology', name: '심리 안정성 지수', items: [2, 3, 4, 7, 23], reverse: true },
+          { id: 'independence', name: '평가 독립성 지수', items: [24, 40, 42, 43, 44, 45], reverse: true },
+          { id: 'srl', name: '자기조절 학습 지수', items: [28, 29, 31, 33, 34, 38], reverse: false },
+          { id: 'imagery', name: '심상 훈련 활용 지수', items: [26, 27, 30, 32, 35, 36, 37], reverse: false },
+          { id: 'social', name: '주위 적응력 지수', items: [17, 18, 22, 25, 12], reverse: true },
+          { id: 'resilience', name: '실패 회복력 지수', items: [6, 8, 11, 13, 14, 15], reverse: true },
+          { id: 'attitude', name: '훈련 태도 지수', items: [19, 20, 21], reverse: true },
+        ];
+
+        const SURVEY_OPTIONS = [
+          { value: 1, label: "전혀 그렇지 않다", icon: <XCircle size={22} /> },
+          { value: 2, label: "그렇지 않다", icon: <MinusCircle size={22} /> },
+          { value: 3, label: "약간 그렇지 않다", icon: <Circle size={22} /> },
+          { value: 4, label: "약간 그렇다", icon: <CheckCircle size={22} /> },
+          { value: 5, label: "그렇다", icon: <Smile size={22} /> },
+          { value: 6, label: "매우 그렇다", icon: <Flame size={22} /> }
+        ];
+
+        const QUESTIONS = [
+          "오늘 연습을 망치면, 미래에 내 꿈을 이루지 못할 것 같아서 불안해요.",
+          "자려고 누웠을 때, 걱정거리가 자꾸 떠올라서 잠을 설칠 때가 많아요.",
+          "공부나 친구 관계처럼 매일 생기는 문제들 때문에 기분이 안 좋을 때가 종종 있어요.",
+          "걱정거리 때문에 자다가 자꾸 깨거나 잠들기가 힘들어요.",
+          "작은 실수 하나만 해도, 정신이 없어서 경기에 집중 힘들어요.",
+          "내가 열심히 해도 결과가 마음대로 안 나오면, 너무 답답하고 화가 나요.",
+          "나한테 안 좋은 일이 생길까 봐 자꾸 걱정 돼요.",
+          "경기 중에 실수한 게 자꾸 생각나서, 경기에 집중하기 힘들 때가 종종 있어요.",
+          "몸이 긴장되면, 경기를 하는 동안 그 기분에서 벗어나기가 너무 힘들어요.",
+          "내 모든 시간을 축구에만 쏟지 않으면, 운동을 잘 못 하게 될 것 같아요.",
+          "경기가 한번 꼬이기 시작하면, 그 다음부터 어떻게 해야 할지 모르겠어요.",
+          "나는 속상한 일이 생겼을 때, 누군가에게 털어놓는 게 잘 안돼요.",
+          "나는 갑자기 생각지도 못한 일이 생기면, 바로 적응하기가 너무 힘들어요.",
+          "나는 힘든 일이 생겼을 때, 다시 할 수 있다고 내 마음을 달래는 게 너무 어려워요.",
+          "나는 실수를 한 번 하면 그 생각만 나고, 경기 전체를 보는 게 힘들어져요.",
+          "나는 평소에도 긴장을 하거나 떨릴 때가 많아요.",
+          "누구에게 도와달라고 부탁하는 건, 내가 약하기 때문이라고 생각해요.",
+          "나는 고민이 생겨도, 마음 편히 도와달라고 말할 사람이 없어요.",
+          "나는 약속이나 훈련 시간을 자주 깜빡해요.",
+          "나는 팀 친구들에 비해 힘든 훈련을 끝까지 못 해낼 때가 많아요.",
+          "나는 스스로 '열심히 해야지!' 하는 마음을 갖기가 너무 힘들어요.",
+          "나는 이제 팀 친구들과 같이 어울려 노는 게 별로 즐겁지 않아요.",
+          "나는 이유 없이 갑자기 기분이 안 좋아질 때가 있어요.",
+          "연습이나 시합을 망치면, 소중한 사람들이 나에게 종종 실망해요.",
+          "나는 다른 사람에게 도와달라고 하거나 물어보는 게 싫어요.",
+          "나는 기술을 배우거나 경기를 준비할 때 머릿속으로 이미지를 그려봐요.",
+          "나는 시합에서 더 잘하기 위해 머릿속으로 상상을 해요.",
+          "나는 뛰어난 선수가 되기 위해 잘 세운 목표가 있어요.",
+          "나는 실패했을 때 어떻게 할지 미리 생각해 봐요.",
+          "나는 내가 멋지게 경기하는 모습을 머릿속으로 자주 그려봐요.",
+          "나는 내가 이루고 싶은 목표를 어떻게 성공시킬지 자주 계획해봐요.",
+          "나는 몸으로 해보기 전에, 머릿속으로 먼저 연습해 보는 걸 좋아해요.",
+          "나는 연습한 내용을 머릿속으로 떠올리며, 어떤 부분을 조심해야 할지 미리 생각해요.",
+          "나는 코치님이 시킨 게 뭔지 정확히 알 때까지 충분히 생각해요.",
+          "나는 내가 할 플레이를 머릿속으로 몇 번이고 계속 반복해서 그려봐요.",
+          "나는 운동을 시작하기 전에, 내가 할 동작을 머릿속으로 먼저 그려봐요.",
+          "나는 훈련할 때 몸만 움직이지 않고, 머리 속으로도 내 동작을 계속 그려봐요.",
+          "나는 경기장에 가기 전, 내가 오늘 해야 할 일들을 머릿속으로 한번 더 확인해요.",
+          "나는 음식을 먹은 후 살이 쪄서 몸이 변할까 봐 걱정되거나, 마음이 불편한 적이 있어요.",
+          "나는 축구를 잘 못하게 되면, 사람들이 나에게 실망해서 떠나갈 것 같다는 생각이 들어요.",
+          "나는 내 몸이 무거워져서 축구를 잘 못하게 될까 봐 걱정되요.",
+          "나는 축구가 잘 안되면, 코치님이나 부모님이 나를 부족한 선수라고 생각하실까 봐 무서워요.",
+          "내가 축구가 잘 안되었을 때, 실제로 주변의 관심이 줄어들어요.",
+          "내가 실수했을 때 사람들이 나를 실망스럽게 쳐다볼까 봐 매번 걱정이 돼요.",
+          "연습이나 시합을 망치고 나면, '나는 영영 멋진 축구선수가 될 수 없을까 봐' 겁이 나요.",
+          "나는 다른 더 좋은 방법이 있는지 생각하지 않고, 그냥 하던 대로 바로 할 때가 많아요.",
+          "나는 경기가 잘안풀리면, 친구들이나 주변 상황을 먼저 탓할 때가 많아요.",
+          "나는 경기중에 갑자기 생각지도 못한 일이 생기면, 어떻게 해야 단지 몰라서 힘들어요.",
+          "나는 하면 안 된다는 걸 알면서도, 나도 모르게 그냥 해버릴 때가 자주 있어요.",
+          "나한테 안 좋다는 걸 알지만, 내가 하고 싶어서 그냥 해버릴 때가 있어요.",
+          "나는 나쁜 습관을 고치는 게 너무 힘들어요."
+        ];
+
+        // --- Sub-components ---
+
+        // Step 1: 프로필 폼
+        const ProfileForm = memo(({ profile, setProfile, onNext }) => (
+          <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6 font-[Pretendard]">
+              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md w-full p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-xl space-y-8">
+                
+                <div className="text-center space-y-2 mb-8">
+                  <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight break-keep">유소년엘리트선수 스포츠멘탈 테스트 Standard</h1>
+                  <p className="text-gray-500 text-sm font-bold mt-2">총 51문항 / 예상 소요시간 7~10분</p>
+                </div>
+
+                <div className="space-y-2">
+                  <h2 className="text-xl font-bold text-gray-900">기본 정보 입력</h2>
+                  <p className="text-sm text-gray-500">여러분을 위한 맞춤 리포트를 만들게요.</p>
+                </div>
+
+                <div className="space-y-5">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700 ml-1">선수 이름</label>
+                    <input type="text" className="w-full p-4 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-gray-800" 
+                      value={profile.name} onChange={e => setProfile(p => ({...p, name: e.target.value}))} placeholder="이름을 입력하세요" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-700 ml-1">생년월일</label>
+                      <input type="date" className="w-full p-4 rounded-2xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-gray-800" 
+                        value={profile.birth} onChange={e => setProfile(p => ({...p, birth: e.target.value}))} />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-700 ml-1">성별</label>
+                      <div className="flex bg-gray-100 p-1.5 rounded-2xl h-[58px]">
+                        {['남', '여'].map(g => (
+                          <button key={g} onClick={() => setProfile(p => ({...p, gender: g}))}
+                            className={`flex-1 rounded-xl text-sm font-bold transition-all h-full ${profile.gender === g ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-400'}`}>{g}</button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button onClick={onNext} disabled={!profile.name} className="w-full py-5 mt-4 bg-gray-900 text-white rounded-3xl font-bold disabled:bg-gray-200 transition-all shadow-lg active:scale-95">
+                  입력완료
+                </button>
+              </motion.div>
+          </div>
+        ));
+
+        // Step 2: 소개 화면
+        const Intro = memo(({ onNext }) => (
+          <div className="flex flex-col items-center justify-center min-h-[100vh] bg-gray-50 text-center p-6 space-y-8 font-[Pretendard]">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 max-w-2xl mx-auto w-full">
+              
+              <div className="text-center space-y-2 mb-8">
+                <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight break-keep">유소년엘리트선수 스포츠멘탈 테스트 Standard</h1>
+                <p className="text-gray-500 text-sm font-bold mt-2">총 51문항 / 예상 소요시간 7~10분</p>
+              </div>
+
+              <div className="bg-white border border-gray-100 p-6 md:p-10 rounded-[2rem] flex flex-col items-center gap-4 text-center shadow-sm">
+                <Heart className="text-indigo-500 shrink-0" size={32}/>
+                <p className="text-base md:text-lg text-gray-700 leading-relaxed break-keep font-medium">
+                  이 테스트는 영국 프리미어리그, 네덜란드 등 유럽 또래의 엘리트 선수들이 주기적으로 수행하는 평가방식이에요. 점수에 따라 여러분의 실력을 평가하거나 성적을 매기는 것이 아니에요.<br/><br/>
+                  <strong className="text-indigo-600 text-xl font-black">여러분이 더 멋진 선수로 성장하기 위해, 지금 내 마음 상태가 어떤지 알려주는 보물지도</strong>와 같습니다. 편안하게 평소의 생각을 골라주세요!
+                </p>
+              </div>
+            </motion.div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-2xl mx-auto">
+              {[
+                { title: "성장 습관", desc: "훈련을 평소에 잘 준비하는지 알아봐요.", icon: <TrendingUp size={24} className="text-indigo-500"/> },
+                { title: "멘탈 기술", desc: "집중, 긴장 이완, 상상 기술을 점검해요.", icon: <Zap size={24} className="text-amber-500"/> },
+                { title: "실전 대처", desc: "압박이나 실수 상황 대처 능력을 확인해요.", icon: <RefreshCw size={24} className="text-emerald-500"/> },
+              ].map((item, i) => (
+                <div key={i} className="p-6 bg-white rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center space-y-3">
+                  <div className="p-3 bg-gray-50 rounded-2xl">{item.icon}</div>
+                  <h3 className="font-bold text-gray-800">{item.title}</h3>
+                  <p className="text-sm text-gray-500 break-keep leading-snug">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+            
+            <button onClick={onNext} className="mt-8 px-12 py-5 bg-indigo-600 text-white rounded-full font-bold text-lg shadow-xl hover:bg-indigo-700 transition-all flex items-center gap-2 transform hover:scale-105 active:scale-95">
+              체크 시작하기 <ChevronRight size={20}/>
+            </button>
+          </div>
+        ));
+
+        // Step 3: 설문지
+        const Survey = memo(({ answers, setAnswers, onSubmit, showAlert }) => {
+          const [currentPage, setCurrentPage] = useState(0);
+          const timeoutRef = useRef(null);
+          const QUESTIONS_PER_PAGE = 5;
+          const totalPages = Math.ceil(QUESTIONS.length / QUESTIONS_PER_PAGE);
+
+          const answeredCount = answers.filter(a => a !== 0).length;
+          
+          const startIndex = currentPage * QUESTIONS_PER_PAGE;
+          const currentQuestions = QUESTIONS.slice(startIndex, startIndex + QUESTIONS_PER_PAGE);
+
+          const isCurrentPageComplete = currentQuestions.every((_, i) => answers[startIndex + i] !== 0);
+
+          const handleOptionSelect = (absoluteIndex, value) => {
+            setAnswers(prev => {
+              const next = [...prev];
+              next[absoluteIndex] = value;
+              return next;
+            });
+
+            const willBeComplete = currentQuestions.every((_, i) => {
+              const idx = startIndex + i;
+              return idx === absoluteIndex ? value !== 0 : answers[idx] !== 0;
+            });
+
+            if (willBeComplete && currentPage < totalPages - 1) {
+              if (timeoutRef.current) clearTimeout(timeoutRef.current);
+              const nextTargetPage = currentPage + 1;
+              timeoutRef.current = setTimeout(() => {
+                setCurrentPage(nextTargetPage);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }, 400);
+            }
+          };
+
+          const handlePrev = () => {
+            if (currentPage > 0) {
+              setCurrentPage(prev => prev - 1);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          };
+
+          const handleFinalSubmit = () => {
+            if (!isCurrentPageComplete) {
+              showAlert("현재 페이지의 모든 문항에 답변해주세요! ✨");
+              return;
+            }
+            if (answers.includes(0)) {
+              showAlert("아직 답변하지 않은 문항이 있어요. 이전 페이지들을 확인해주세요! ✨");
+              return;
+            }
+            onSubmit();
+          };
+
+          React.useEffect(() => {
+            return () => {
+              if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            };
+          }, []);
+
+          return (
+            <div className="max-w-5xl mx-auto py-6 px-4 md:px-6 space-y-6 font-[Pretendard] bg-white">
+              <div className="sticky top-0 bg-white/95 backdrop-blur-md py-4 z-10 border-b border-gray-100 flex flex-col gap-3 rounded-b-3xl">
+                <div className="flex justify-between items-end px-4">
+                  <div className="space-y-1">
+                    <h2 className="text-xl md:text-2xl font-black text-gray-900">스포츠 멘탈 설문지</h2>
+                    <p className="text-[12px] md:text-[13px] text-indigo-500 font-bold tracking-tight">
+                      페이지 {currentPage + 1} / {totalPages} · 솔직하게 답변할수록 정확해져요! ✨
+                    </p>
+                  </div>
+                  <span className="text-sm font-black text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full border border-indigo-100">{answeredCount} / 51</span>
+                </div>
+                <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden shadow-inner mx-4 max-w-[calc(100%-32px)]">
+                  <motion.div initial={{ width: 0 }} animate={{ width: `${(answeredCount / 51) * 100}%` }} transition={{ type: 'spring', damping: 20 }} className="h-full bg-indigo-500" />
+                </div>
+              </div>
+
+              <div className="space-y-6 pt-2">
+                {currentQuestions.map((q, idx) => {
+                  const absoluteIndex = startIndex + idx;
+                  return (
+                    <div key={absoluteIndex} className="space-y-3 group">
+                      <div className="flex gap-3 items-center px-2">
+                        <span className="text-indigo-100 group-hover:text-indigo-300 transition-colors font-black text-3xl md:text-4xl italic leading-none">{absoluteIndex + 1}</span>
+                        <p className="text-base md:text-lg text-gray-800 font-bold break-keep leading-tight">{q}</p>
+                      </div>
+                      
+                      <div className="grid grid-cols-6 gap-2 md:gap-3">
+                        {SURVEY_OPTIONS.map((opt) => (
+                          <button 
+                            key={opt.value} 
+                            onClick={() => handleOptionSelect(absoluteIndex, opt.value)} 
+                            className={`group flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-2xl border-2 font-bold transition-all relative
+                              ${answers[absoluteIndex] === opt.value 
+                                ? 'border-indigo-600 bg-indigo-600 text-white shadow-xl scale-105 z-10' 
+                                : 'border-gray-50 bg-gray-50/30 text-gray-400 hover:border-indigo-200 hover:text-indigo-600 hover:bg-white'}`}
+                          >
+                            <div className={`transition-transform duration-300 group-hover:scale-110 ${answers[absoluteIndex] === opt.value ? 'scale-110 text-white' : 'text-gray-300'}`}>
+                              {opt.icon}
+                            </div>
+                            <span className={`text-[10px] md:text-[11px] lg:text-[12px] whitespace-nowrap text-center leading-none tracking-tighter transition-colors
+                              ${answers[absoluteIndex] === opt.value ? 'text-white' : 'text-gray-500'}`}>
+                              {opt.label}
+                            </span>
+                            {answers[absoluteIndex] === opt.value && (
+                              <motion.div layoutId={`active-${absoluteIndex}`} className="absolute inset-0 border-4 border-indigo-200 rounded-2xl pointer-events-none opacity-50" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex justify-between items-center pt-6 pb-8 gap-4">
+                <button 
+                  onClick={handlePrev} 
+                  disabled={currentPage === 0}
+                  className={`py-4 bg-gray-100 text-gray-500 rounded-2xl font-bold text-base hover:bg-gray-200 transition-all 
+                    ${currentPage === 0 ? 'opacity-0 cursor-default pointer-events-none' : ''} 
+                    ${currentPage === totalPages - 1 ? 'w-1/3' : 'w-full'}`}
+                >
+                  이전 페이지
+                </button>
+                
+                {currentPage === totalPages - 1 && (
+                  <button onClick={handleFinalSubmit} className="w-2/3 py-4 bg-indigo-600 text-white rounded-2xl font-black text-lg shadow-xl hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    제출하고 결과 확인 <TrendingUp size={20}/>
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        });
+
+        // 비밀번호 입력 컴포넌트 추가
+        const PasswordScreen = memo(({ onSubmit, onCancel, error }) => {
+            const [pwd, setPwd] = useState('');
+            return (
+                <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6 font-[Pretendard]">
+                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white p-10 rounded-[2.5rem] shadow-xl max-w-sm w-full space-y-8 text-center border border-gray-100">
+                        <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto">
+                            <Lock size={36} className="text-indigo-500" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-black text-gray-900">결과 리포트 잠금</h2>
+                            <p className="text-sm text-gray-500 mt-2">결과를 확인하려면 비밀번호를 입력하세요.</p>
+                        </div>
+                        <div className="space-y-2">
+                            <input
+                                type="password"
+                                value={pwd}
+                                onChange={(e) => setPwd(e.target.value)}
+                                className="w-full p-4 border-2 border-gray-100 rounded-2xl text-center text-2xl tracking-widest focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                                placeholder="비밀번호"
+                                onKeyDown={(e) => e.key === 'Enter' && onSubmit(pwd)}
+                            />
+                            {error && <p className="text-red-500 text-sm font-bold animate-pulse mt-2">{error}</p>}
+                        </div>
+                        <div className="space-y-3">
+                            <button
+                                onClick={() => onSubmit(pwd)}
+                                className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-lg hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-200"
+                            >
+                                확인
+                            </button>
+                            <button
+                                onClick={onCancel}
+                                className="w-full py-4 bg-gray-100 text-gray-500 rounded-2xl font-bold text-lg hover:bg-gray-200 active:scale-95 transition-all"
+                            >
+                                처음으로 돌아가기
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            )
+        });
+
+        // --- Main App Component ---
+
+        function App() {
+          const [step, setStep] = useState('profile'); // profile -> intro -> survey -> password -> result
+          const [profile, setProfile] = useState({ name: '', birth: '', gender: '남' });
+          const [answers, setAnswers] = useState(Array(51).fill(0));
+          const [passwordError, setPasswordError] = useState('');
+          const [copySuccess, setCopySuccess] = useState(false);
+          const [hasSavedImage, setHasSavedImage] = useState(false);
+
+          // 커스텀 모달(팝업) 상태
+          const [modalConfig, setModalConfig] = useState({ isOpen: false, type: 'alert', message: '', onConfirm: null, buttons: [] });
+
+          const showAlert = (message) => setModalConfig({ isOpen: true, type: 'alert', message, onConfirm: null });
+          const showConfirm = (message, onConfirm) => setModalConfig({ isOpen: true, type: 'confirm', message, onConfirm });
+          const closeModal = () => setModalConfig({ ...modalConfig, isOpen: false });
+
+          const data = useMemo(() => {
+            if (step !== 'result') return null;
+            
+            // Calculate 5 PCDEQ Scores
+            const pcdeq = Object.entries(PCDEQ_MAPPING).map(([id, config]) => {
+              const sum = config.items.reduce((acc, idx) => {
+                const raw = answers[idx - 1] || 1;
+                return acc + (config.reverse ? (7 - raw) : raw);
+              }, 0);
+              return { id, name: config.name, score: Number((sum / config.items.length).toFixed(1)) };
+            });
+            
+            const fScores = pcdeq.reduce((acc, s) => ({ ...acc, [s.id]: s.score }), {});
+            
+            // MGI Formula calculation
+            const mgi = Number(((fScores[1] * 0.25) + (fScores[4] * 0.30) + (fScores[3] * 0.25) + (fScores[5] * 0.20)).toFixed(1));
+            
+            // Extra indices calculation
+            const extra = EXTRA_INDICES.map(idx => {
+              const sum = idx.items.reduce((acc, qIdx) => {
+                const raw = answers[qIdx - 1] || 1;
+                return acc + (idx.reverse ? (7 - raw) : raw);
+              }, 0);
+              return { ...idx, score: Number((sum / idx.items.length).toFixed(1)) };
+            });
+            
+            const scoreReview = MPS_SCORE_REVIEW.highScores([...pcdeq, ...extra, { name: 'MGI 멘탈 성장지수', score: mgi }]);
+            return { pcdeq, mgi, extra, scoreReview };
+          }, [answers, step]);
+
+          const handlePasswordSubmit = (pwd) => {
+            if (pwd === '2') {
+                setStep('result');
+                setPasswordError('');
+            } else {
+                setPasswordError('비밀번호가 일치하지 않습니다.');
+            }
+          };
+
+          const handleCopyText = () => {
+              if(!data) return;
+              let text = `[${profile.name} 선수 멘탈 리포트]\n\n`;
+              text += `■ 핵심 멘탈 지수\n`;
+              data.pcdeq.forEach(item => text += `- ${item.name}: ${item.score.toFixed(1)}\n`);
+              text += `\n★ MGI 멘탈 성장지수: ${data.mgi.toFixed(1)}\n\n`;
+              text += `■ 상세 분석 데이터\n`;
+              data.extra.forEach(item => text += `- ${item.name}: ${item.score.toFixed(1)}\n`);
+               const scoreReviewText = MPS_SCORE_REVIEW.noticeText(data.scoreReview);
+               if (scoreReviewText) text += `\n■ ${scoreReviewText}\n`;
+
+              const textarea = document.createElement('textarea');
+              textarea.value = text;
+              document.body.appendChild(textarea);
+              textarea.select();
+              try {
+                  document.execCommand('copy');
+                  setCopySuccess(true);
+                  setTimeout(() => setCopySuccess(false), 2000);
+              } catch (err) {
+                  console.error('Failed to copy', err);
+              }
+              document.body.removeChild(textarea);
+          };
+
+          const handleDownloadImage = () => {
+              const captureTarget = document.getElementById('report-capture-area');
+              if (!captureTarget) return;
+
+              window.html2canvas(captureTarget, { 
+                  scale: 2, // 고해상도 캡처
+                  backgroundColor: '#ffffff'
+              }).then(canvas => {
+                  const link = document.createElement('a');
+                  link.download = `${profile.name}_선수_멘탈리포트.png`;
+                  link.href = canvas.toDataURL('image/png');
+                  link.click();
+                  setHasSavedImage(true); // 저장 상태 기록
+              });
+          };
+
+          const executeReset = () => {
+              setStep('profile'); // 메인 화면으로 이동
+              setProfile({ name: '', birth: '', gender: '남' });
+              setAnswers(Array(51).fill(0));
+              setPasswordError('');
+              setHasSavedImage(false); // 리셋 시 저장상태도 초기화
+          };
+
+          const handleReset = () => {
+              // 이미지 저장을 안 한 경우 커스텀 팝업 띄우기
+              if (!hasSavedImage) {
+                  setModalConfig({
+                      isOpen: true,
+                      type: 'custom',
+                      message: '이미지 저장을 하셨습니까?\n결과를 보관하시려면 이미지 저장을 권장합니다.',
+                      buttons: [
+                          { label: '이미지 저장하기', style: 'bg-indigo-600 text-white', action: () => { closeModal(); handleDownloadImage(); } },
+                          { label: '그냥 초기화', style: 'bg-gray-100 text-gray-600 hover:bg-gray-200', action: () => { closeModal(); executeReset(); } }
+                      ]
+                  });
+              } else {
+                  // 이미 저장한 경우 일반 확인 팝업
+                  showConfirm("처음으로 돌아가시겠습니까? 입력한 모든 데이터가 초기화됩니다.", executeReset);
+              }
+          };
+
+          return (
+            <div className="min-h-screen bg-gray-50 font-[Pretendard]">
+              {/* 커스텀 모달 UI */}
+              {modalConfig.isOpen && (
+                  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white p-8 rounded-3xl shadow-2xl max-w-sm w-full text-center space-y-6">
+                          <p className="text-lg font-bold text-gray-800 break-keep leading-snug whitespace-pre-wrap">{modalConfig.message}</p>
+                          <div className="flex gap-3 justify-center">
+                              {modalConfig.type === 'custom' ? (
+                                  modalConfig.buttons.map((btn, i) => (
+                                      <button key={i} onClick={btn.action} className={`px-5 py-3 rounded-xl font-bold transition-all ${btn.style}`}>{btn.label}</button>
+                                  ))
+                              ) : (
+                                  <>
+                                      {modalConfig.type === 'confirm' && (
+                                          <button onClick={closeModal} className="px-6 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-all">취소</button>
+                                      )}
+                                      <button onClick={() => {
+                                          if (modalConfig.onConfirm) modalConfig.onConfirm();
+                                          closeModal();
+                                      }} className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all">확인</button>
+                                  </>
+                              )}
+                          </div>
+                      </motion.div>
+                  </div>
+              )}
+
+              <AnimatePresence mode="wait">
+                {step === 'profile' && <ProfileForm key="profile" profile={profile} setProfile={setProfile} onNext={() => setStep('intro')} />}
+                {step === 'intro' && <Intro key="intro" onNext={() => setStep('survey')} />}
+                {step === 'survey' && <Survey key="survey" answers={answers} setAnswers={setAnswers} showAlert={showAlert} onSubmit={() => { 
+                    if (answers.includes(0)) showAlert("아직 답변하지 않은 문항이 있어요. 모든 문항을 확인해주세요! ✨"); 
+                    else setStep('password');
+                }} />}
+                
+                {step === 'password' && (
+                    <PasswordScreen 
+                        key="password" 
+                        onSubmit={handlePasswordSubmit} 
+                        error={passwordError} 
+                        onCancel={() => showConfirm("페이지를 나가시겠습니까?\n작성하신 내용은 모두 초기화됩니다.", executeReset)}
+                    />
+                )}
+
+                {step === 'result' && data && (
+                  <motion.div key="result" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="min-h-screen py-12 px-4 flex flex-col items-center relative">
+                      
+                      {/* 액션 버튼 (캡처 영역 외부) */}
+                      <div className="w-full max-w-2xl flex flex-wrap justify-end gap-3 mb-6">
+                          <button onClick={handleReset} className="mr-auto flex items-center gap-2 px-5 py-3 bg-red-50 text-red-600 border border-red-200 rounded-xl font-bold hover:bg-red-100 shadow-sm transition-all active:scale-95">
+                              <RefreshCw size={18} /> 초기화
+                          </button>
+                          <button onClick={handleDownloadImage} className="flex items-center gap-2 px-5 py-3 bg-white border border-gray-200 rounded-xl text-gray-700 font-bold hover:bg-gray-50 shadow-sm transition-all active:scale-95">
+                              <Download size={18} /> 이미지 저장
+                          </button>
+                          <button onClick={handleCopyText} className="flex items-center gap-2 px-5 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-md shadow-indigo-200 transition-all active:scale-95">
+                              <Copy size={18} /> 결과 복제하기
+                          </button>
+                      </div>
+
+                      {/* 복사 성공 알림 */}
+                      <AnimatePresence>
+                          {copySuccess && (
+                              <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="fixed top-10 bg-gray-900 text-white px-6 py-3 rounded-full font-bold shadow-2xl z-50">
+                                  텍스트가 클립보드에 복사되었습니다! ✅
+                              </motion.div>
+                          )}
+                      </AnimatePresence>
+
+                      {/* 이미지 캡처 대상 영역 */}
+                      <div id="report-capture-area" className="bg-white w-full max-w-2xl p-10 md:p-14 rounded-[3rem] shadow-xl border border-gray-100">
+                          
+                          {/* 헤더 */}
+                          <div className="text-center mb-12 border-b border-gray-100 pb-8">
+                              <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight mb-3">유소년엘리트선수 스포츠멘탈 테스트 Standard<br/><span className="text-indigo-600">{profile.name} 선수 리포트</span></h1>
+                              <p className="text-gray-500 font-medium tracking-wide">
+                                  성별: {profile.gender} {profile.birth && `| 생년월일: ${profile.birth}`}
+                              </p>
+                          </div>
+
+                          <div className="space-y-12">
+                              {data.scoreReview.length > 0 && (
+                                  <aside className="mps-score-notice" aria-label={MPS_SCORE_REVIEW.title}>
+                                      <strong>{MPS_SCORE_REVIEW.title}</strong>
+                                      <p className="mps-score-notice-scores">해당 영역: {MPS_SCORE_REVIEW.formatScores(data.scoreReview)}</p>
+                                      <p>{MPS_SCORE_REVIEW.message}</p>
+                                      <small>{MPS_SCORE_REVIEW.basis}</small>
+                                  </aside>
+                              )}
+                              {/* 핵심 멘탈 지수 */}
+                              <div className="space-y-2">
+                                  <h2 className="text-xl font-black text-indigo-600 mb-6 flex items-center gap-2">
+                                      <Target size={24}/> 핵심 멘탈 지수
+                                  </h2>
+                                  <div className="bg-gray-50/50 rounded-3xl p-6 border border-gray-100 space-y-2">
+                                      {data.pcdeq.map(item => (
+                                          <div key={item.id} className="flex justify-between items-center py-3 border-b border-gray-100/50 last:border-0">
+                                              <span className="text-lg font-bold text-gray-700">{item.name}</span>
+                                              <span className="text-2xl font-black text-gray-900">{item.score.toFixed(1)}</span>
+                                          </div>
+                                      ))}
+                                  </div>
+                                  
+                                  {/* MGI 강조 */}
+                                  <div className="flex justify-between items-center py-6 mt-6 bg-indigo-50 rounded-3xl px-8 border border-indigo-100 shadow-inner">
+                                      <span className="text-xl font-black text-indigo-900">MGI 멘탈 성장지수</span>
+                                      <span className="text-4xl font-black text-indigo-600">{data.mgi.toFixed(1)}</span>
+                                  </div>
+                              </div>
+
+                              {/* 상세 분석 데이터 */}
+                              <div className="space-y-2 pt-4">
+                                  <h2 className="text-xl font-black text-gray-800 mb-6 flex items-center gap-2">
+                                      <Activity size={24}/> 상세 분석 데이터
+                                  </h2>
+                                  <div className="bg-white rounded-3xl border border-gray-200 px-6 py-4">
+                                      {data.extra.map((item, idx) => (
+                                          <div key={item.id} className={`flex justify-between items-center py-3 ${idx !== data.extra.length - 1 ? 'border-b border-gray-100' : ''}`}>
+                                              <span className="text-base font-bold text-gray-600">{item.name}</span>
+                                              <span className="text-xl font-black text-gray-800">{item.score.toFixed(1)}</span>
+                                          </div>
+                                      ))}
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          );
+        }
+
+        // --- 렌더링 ---
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

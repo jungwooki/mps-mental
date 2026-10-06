@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+await import('../resources/report-score-notice.js');
+const review=globalThis.MPS_SCORE_REVIEW;
+assert.deepEqual(review.highScores([{name:'below',score:5.499},{name:'boundary',score:5.5},{name:'maximum',score:6},{name:'wrong scale',score:95},{name:'missing',score:null},{name:'nan',score:NaN}]).map(s=>s.name),['boundary','maximum']);
+assert.equal(review.noticeText([{name:'low',score:5.4}]),'');
+assert.match(review.noticeText([{name:'준비 능력',score:5.5}]),/과도한 자기신념/);
+assert.match(review.noticeText([{name:'준비 능력',score:5.5}]),/준비 능력 5.5점/);
+assert.match(review.noticeText([{name:'준비 능력',score:5.5}]),/검증된 절단점은 아닙니다/);
+assert.equal(review.tierIncludesThreshold('(5.0 – 6.0)'),true);
+assert.equal(review.tierIncludesThreshold('(4.3 이상)'),true);
+assert.equal(review.tierIncludesThreshold('(4.3 – 4.9)'),false);
+assert.equal(review.tierIncludesThreshold('(90 – 100)'),false);
+assert.equal(review.tierIncludesThreshold(''),false);
+assert.match(review.noticeHTML([],true),/실제 원점수가 5.5점 이상일 때/);
+console.log('PASS: inclusive 5.5 threshold, 6-point scale, empty values, conditional coaching tiers, copy text');

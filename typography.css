@@ -1,0 +1,17 @@
+/* Shared typography for every Base Camp page, including print and embedded resources. */
+@font-face {
+  font-family: "Basecamp Pretendard";
+  src: url("./assets/PretendardVariable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+/* Layered important rules also override legacy page-specific important rules. */
+@layer basecamp-typography {
+  :root, body, body *:not(.fa):not(.fas):not(.far):not(.fab):not(.fal):not(.fad):not(.material-icons):not([class*="material-symbols"]) {
+    font-family: "Basecamp Pretendard", Pretendard, sans-serif !important;
+  }
+  input::placeholder, textarea::placeholder {
+    font-family: "Basecamp Pretendard", Pretendard, sans-serif !important;
+  }
+}

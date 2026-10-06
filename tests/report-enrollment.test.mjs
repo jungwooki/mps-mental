@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {findEnrolledPlayer,filterReportRoster,reportEnrollmentFields} from '../report-enrollment.js';
+const a={id:'r1',name:'테스트 선수',number:'S001',birth:'2014-01-02',sex:'남',organization:'팀 A'};
+const b={...a,id:'r2',number:'S002'};
+const roster={r1:a,r2:b};
+assert.equal(filterReportRoster(roster,'S001').length,1);
+assert.equal(filterReportRoster(roster,'테스트선수').length,2);
+assert.equal(findEnrolledPlayer({},'r1'),undefined);
+assert.equal(findEnrolledPlayer({old:{id:'old',name:a.name,number:a.number}},'r1'),undefined,'matching name/chart alone never implies explicit registration');
+assert.equal(findEnrolledPlayer({auto:{id:'r1',source:'2026mental2'}},'r1'),undefined,'auto-imported cache is not a managed enrollment');
+const managed={id:'m1',reportSourcePlayerId:'r1',managed:true,note:'기존 메모'};
+assert.equal(findEnrolledPlayer({m1:managed},'r1'),managed);
+assert.deepEqual(reportEnrollmentFields(a),{name:a.name,number:a.number,birth:a.birth,sex:a.sex,organization:a.organization,reportUrl:'./reports/2026mental2/index.html?player=r1'});
+assert.equal(reportEnrollmentFields({...a,birth:'미기록'}).birth,'');
+assert.equal(managed.note,'기존 메모');
+console.log('PASS: name/chart search, explicit enrollment, duplicate protection, no automatic roster registration');

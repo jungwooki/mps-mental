@@ -1,0 +1,117 @@
+/* Shared visual language with 2026mental2: cream, sage, ink and terracotta. */
+:root{--ink:#263e42;--sub:#566760;--orange:#cf603d;--green:#3f6253;--cream:#faf8f2;--line:#deded3;--soft:#eef2e9;--blue:#eef2f5;--emr-line:#deded3;--hq-sidebar:184px}
+body{background:var(--cream);color:var(--ink);font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+body .sidebar{width:184px;background:#f0f1e9;border-color:var(--line);padding:24px 14px}
+body main{margin-left:184px;background:var(--cream)}
+body .sidebar nav>a{font-size:14px;min-height:44px;padding:11px 12px;color:var(--sub)}
+body .sidebar nav>a[aria-current=page],body .sidebar nav>a:hover{background:#e0e8db;color:var(--green)}
+body .sidebar .nav-label,body .sidebar .landing-label,body .sidebar .sidebar-bottom .tiny{font-size:11px;color:var(--sub)}
+body .sidebar .brand{margin-bottom:30px}body #coach-account{left:20px;max-width:150px}
+body .topbar{background:#fffdf8;border-color:var(--line);color:var(--sub)}
+body .content{background:var(--cream)}
+body h1,body h2,body h3,body h4{color:var(--ink);letter-spacing:-.035em}
+body .eyebrow{color:var(--orange);letter-spacing:.12em}
+body .muted,body .tiny{color:var(--sub)}
+body .panel,body .resource,body dialog,body .summary-dock{background:#fffdf8;border-color:var(--line);border-radius:11px;box-shadow:none}
+body .tone-lavender,body .tone-mint,body .fill-violet{background:var(--soft)}body .tone-blue{background:var(--blue)}body .tone-peach{background:#f7ebdd}
+body .button,body button,body .primary{border-radius:7px;font-size:14px;min-height:40px}
+body .button{background:#fffdf8;border-color:#cfd6cb;color:var(--ink)}
+body .primary,body button.primary{background:var(--green);border-color:var(--green);color:white}
+body :is(input,textarea,select){border-color:#cfd6cb;border-radius:7px;color:var(--ink);font-size:14px;background:#fffefb}
+body :is(button,a,input,textarea,select,summary):focus-visible{outline:3px solid #cf603d;outline-offset:3px}
+body button:disabled{opacity:.45;cursor:not-allowed}
+body .section-nav a{color:var(--green)}body .section-nav{background:var(--soft)}
+body #mental-stats{background:#fffdf8;border-color:var(--line)}body #mental-stats>article b{color:var(--green)}
+#chart.content{background:var(--cream)}
+#chart .chart-workspace-toolbar{padding:18px 22px}#chart .chart-workspace-toolbar h1{font-size:24px}
+#chart .emr-columns{grid-template-columns:190px 210px minmax(0,1fr)}
+#chart .athlete-column,#chart .emr-columns>.session-rail{background:#f6f5ef}
+#chart .consultation-column{background:var(--cream);padding:16px 24px 50px}
+#chart .athlete-choice{background:#fffdf8;border-color:var(--line);padding:12px}
+#chart .athlete-choice b,#chart .column-heading h2{font-size:14px;color:var(--ink)}
+#chart .athlete-choice small,#chart .athlete-choice-meta,#chart .session-entry .session-choice-header time{font-size:12px;color:var(--sub)}
+#chart .athlete-choice[aria-current=true],#chart .session-entry .session-choice[aria-current=true]{background:#e5ecdf;color:var(--green)}
+#chart .athlete-choice[aria-current=true] b{color:var(--green)}
+#chart .session-entry{background:#fffdf8}#chart .session-expanded-note{display:none}
+#chart .session-entry .session-topic-preview{font-size:13px}
+#chart .consultation-column #chart-player-card{background:var(--soft);border:1px solid var(--line);border-radius:11px;padding:18px;margin-bottom:18px}
+#chart .consultation-column #chart-player-card .player-identity-details dd{font-size:13px;color:var(--ink)}
+.coaching-steps{display:flex;gap:8px;margin:0 0 22px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.coaching-steps button{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;background:transparent;border:1px solid transparent;color:var(--sub);padding:12px 8px}
+.coaching-steps button span{font-family:Georgia,serif;color:var(--orange);font-size:18px}
+.coaching-steps button[aria-current=step]{background:#e5ecdf;color:var(--green);border-color:#cbd7c3;font-weight:750}
+.prepare-intro,.finish-intro{padding:8px 0 20px}.prepare-intro h2,.finish-intro h2{font-size:22px;margin:8px 0}
+.prepare-intro p,.finish-intro p{font-size:14px;line-height:1.8;color:var(--sub)}
+#chart .previous-session-plan{margin:18px 0;padding:18px;background:#fffdf8;border:1px solid var(--line);border-left:3px solid var(--orange);border-radius:9px}
+#chart .previous-session-plan h4,#chart .previous-session-plan p{font-size:14px;color:var(--ink)}#chart .previous-session-plan p b,#chart .previous-session-plan>small{font-size:12px;color:var(--sub)}
+#chart .consultation-column .consultation-editor{background:#fffdf8;border-radius:11px;overflow:hidden}
+#chart .consultation-editor>.column-heading{background:#fffdf8}#chart .consultation-toggle{background:var(--soft);color:var(--green);font-size:15px}
+#chart .consultation-column #session-form{padding:20px}
+#chart .emr-field>span{font-size:14px;color:var(--ink);margin-bottom:8px}
+#chart #session-form .emr-field #session-note{font-size:16px;line-height:1.9;min-height:280px;background:#fffefb}
+#chart .consultation-recording{background:var(--soft);border-color:var(--line)}
+.optional-notes{margin:18px 0;border-top:1px solid var(--line);padding:16px 0}.optional-notes summary{cursor:pointer;color:var(--green);font-size:14px}.optional-notes summary small{color:var(--sub);margin-left:8px}.optional-notes .session-support-fields{margin-top:16px}
+.finish-actions{border-top:1px solid var(--line);padding-top:20px;margin-top:20px}.finish-actions p{font-size:14px;color:var(--green);line-height:1.7}
+#chart[data-coaching-step=prepare] #chart-body{display:none}
+#chart:not([data-coaching-step=prepare]) [data-flow-panel=prepare]{display:none}
+#chart:not([data-coaching-step=finish]) [data-flow-panel=finish]{display:none}
+#chart[data-coaching-step=finish] :is(.session-metadata,.consultation-recording,.emr-field-note,.optional-notes,.record-actions,.note-history){display:none}
+#chart .consultation-column :is(#coach-profile,#coach-diary){background:#fffdf8;border:1px solid var(--line);border-radius:11px;padding:18px;margin-bottom:18px}
+#chart .consultation-column .diary-records,#chart .consultation-column .diary-prompts{max-height:none}
+body .summary-toggle{background:var(--soft);color:var(--green)}
+@media(min-width:1101px){#chart .consultation-column{max-width:1050px;width:100%;justify-self:center}}
+@media(max-width:1100px){#chart .emr-columns{grid-template-columns:190px minmax(0,1fr)}#chart .athlete-column{display:none}#chart .chart-workspace-toolbar .player-picker{display:block}#chart .emr-columns>.session-rail{grid-column:1;grid-row:1;position:sticky}#chart .consultation-column{grid-column:2;grid-row:1;padding:16px}#chart .chart-actions{flex-wrap:wrap}#chart .consultation-column .session-metadata{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){body .sidebar{width:auto;position:relative;padding:14px}body .sidebar .brand{margin-bottom:12px}body .sidebar nav{display:flex;flex-wrap:wrap}body .sidebar nav>a{font-size:13px}body .sidebar .sidebar-bottom,body .sidebar .landing-label,body .sidebar .landing-nav,body .workspace-divider{display:none}body main{margin-left:0}body #coach-account{position:static;max-width:none;margin:12px}#chart .emr-columns{display:flex;flex-direction:column}#chart .emr-columns>.session-rail{position:static;width:100%;height:auto;max-height:210px;border-bottom:1px solid var(--line)}#chart .consultation-column{width:100%;padding:16px}#chart .chart-workspace-toolbar{padding:16px;flex-wrap:wrap}#chart .chart-workspace-toolbar .player-picker{max-width:100%}#chart .coaching-steps button{font-size:13px;padding:10px 4px;gap:5px}#chart .consultation-column .session-plan-fields{grid-template-columns:1fr}#chart .consultation-column #chart-player-card .player-identity-details{grid-template-columns:1fr 1fr}body input,body select,body textarea{font-size:16px}#chart .consultation-column #session-form{padding:16px}}
+@media print{.coaching-steps,.prepare-intro,.finish-actions{display:none!important}#chart #chart-body,#chart [data-flow-panel=finish],#chart .emr-field-note,#chart .session-metadata{display:block!important}}
+/* Override the legacy chart's ID-level presentation rules. */
+#chart .primary,#chart button.primary{background:var(--green);border-color:var(--green);color:#fff;font-size:14px;min-height:42px;padding:10px 14px}
+#chart #session-form .emr-field>span{font-size:14px;color:var(--ink)}
+#chart #session-form .emr-field input,#chart #session-form .emr-field textarea{color:var(--ink);font-size:15px;border-radius:7px;background:#fffefb;min-height:42px}
+#chart #session-form .emr-field textarea:focus,#chart #session-form .emr-field input:focus{border-color:var(--green);box-shadow:0 0 0 2px #dce6d6}
+#chart #consultation-recording{background:var(--soft);padding:12px}
+#chart #consultation-recording [data-recording=start]{background:#e0e8db;color:var(--green);font-size:14px}
+#chart[data-coaching-step=finish] #session-form .emr-field-note,#chart[data-coaching-step=finish] #consultation-recording{display:none}
+#chart .record-next{display:flex;justify-content:flex-end;padding:12px 0}
+#chart:not([data-coaching-step=record]) .record-next{display:none}
+#chart .finish-recap{white-space:pre-wrap;font-size:15px;line-height:1.8;background:var(--soft);padding:16px;border-radius:9px;max-height:240px;overflow:auto}
+#chart .session-plan-fields textarea{background:#fffefb!important}
+#chart-player-card .player-growth-identity .growth-stage{background:#4a7161}#chart-player-card .player-growth-identity .growth-difference,#chart-player-card .player-growth-identity .growth-delayed{background:#527482}
+#chart .chart-actions .button,#chart .record-actions .button{font-size:13px;min-height:38px;color:var(--ink)}
+#chart .record-actions .subtle-danger,#chart .chart-actions .subtle-danger{color:#97654f}
+@media(max-width:760px){#chart #session-form .emr-field input,#chart #session-form .emr-field textarea{font-size:16px}}
+@media(max-width:760px){#chart .emr-columns>.session-rail{max-height:none}#chart .emr-columns>.session-rail #session-list{display:flex;max-height:90px;overflow:auto;margin:0}#chart .session-entry{flex:0 0 170px;border-right:1px solid var(--line)}#chart .session-entry .session-choice{padding:9px 12px}#chart .session-entry .session-choice small{display:none}#chart .session-rail .shared-diary-note{display:none}#chart .consultation-column #chart-player-card{padding:12px}#chart .consultation-column #chart-player-card .player-identity-details{display:none}}
+body #mental .resource{border:1px solid var(--line);border-top:3px solid #bacdb5;background:#fffdf8;color:var(--ink)}
+body #mental .resource.tone-blue{border-top-color:#b6cee5}body #mental .resource.tone-peach{border-top-color:#e9b69d}
+body #mental th{background:var(--soft);color:var(--sub);border-color:var(--line)}body #mental td{color:var(--ink);border-color:var(--line)}
+body #mental .text-link,body #mental .player-name{color:var(--green)}body #mental .table-note,body #data-status,body #mental-stats>article .tiny{color:var(--sub)}
+body .summary-dock{display:none}body.chart-open .summary-dock{display:block}
+
+/* Readable text on the light report palette, including hover/focus states. */
+body .eyebrow,.coaching-steps button span{color:#a84b2f}
+body .resource :is(h2,h3,b,strong){color:var(--ink)}
+body .resource :is(p,small,.muted){color:var(--sub)}
+body .resource .button{color:var(--green);background:#eef2e9;border-color:#c5d1bf}
+body .resource .button:is(:hover,:focus-visible){color:#263e42;background:#e0e8db;border-color:#90a58a}
+body .resource:is(:hover,:focus-within){box-shadow:0 4px 14px #263e4210}
+body .topbar .cloud-good{color:#326b54!important}
+body .topbar i{color:var(--sub)}
+body :is(input,textarea)::placeholder{color:#65736e;opacity:1}
+#chart #session-form .emr-field :is(input,textarea)::placeholder,#chart .athlete-search input::placeholder{color:#65736e;opacity:1}
+#chart :is(.workspace-caption,.column-heading small,.rail-heading small,.session-choice small,.session-topic-preview,.player-identity-details dt,.player-growth-identity,.consultation-toggle time){color:var(--sub)}
+#chart #consultation-recording [data-recording=status]{color:var(--sub)}
+#chart .primary:is(:hover,:focus-visible),body .primary:is(:hover,:focus-visible){background:#345344;color:#fff;border-color:#345344}
+#chart :is(.count-badge,.entry-arrow,.column-heading .button,.shared-diary-note,.shared-diary-note p,.type-chip,.metric-group-label,.metric-label small,.metric-reference,.metric-reference small){color:var(--sub)}
+#chart .player-state.active,#chart .profile-signals :is(b,span){color:var(--green)}
+#chart .profile-caution{color:#80562e!important}#chart .profile-legend{color:var(--sub)!important}
+body .summary-toggle span{color:var(--sub)}
+#chart #session-save-status{color:var(--sub)}
+body :is(.back-link,.source-note,.narrative p,.check-box p,.paper-citation p){color:var(--sub)}
+body .steps span,body .say-box>span{color:var(--green)}
+body .check-box b{color:#75613d}
+#delete-consultation-dialog h2{font-size:22px;margin-bottom:16px}
+#delete-consultation-dialog p{font-size:14px;line-height:1.8;color:var(--sub);margin:10px 0}
+#delete-consultation-dialog .resource-actions{justify-content:flex-end;margin-top:24px}
+#delete-consultation-dialog #confirm-consultation-delete{background:#9b4436;border-color:#9b4436;color:white}
+/* Small status marker, not an additional action inside the session button. */
+#chart .session-choice-header .session-complete-dot{display:inline-block;width:9px;height:9px;min-width:9px;flex:0 0 9px;margin-left:auto;border-radius:50%;background:#34835c}
+#chart .session-choice-header:has(.session-complete-dot:not([hidden])) .entry-arrow{margin-left:3px}

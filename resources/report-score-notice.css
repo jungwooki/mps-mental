@@ -1,0 +1,16 @@
+.mps-score-notice{display:block;background:#fff;border:1px solid #d9dee8;border-radius:5px;padding:12px 14px;color:#364154;font-size:12px;line-height:1.6;break-inside:avoid;text-align:left}
+.mps-score-notice strong{display:block;color:#27364b;font-size:13px;font-weight:700}
+.mps-score-notice p{margin:6px 0 0;font-size:inherit;line-height:inherit}
+.mps-score-notice .mps-score-notice-scores{font-weight:600}
+.mps-score-notice small{display:block;margin-top:6px;color:#697587;font-size:11px;line-height:1.5}
+.page .mps-score-notice{padding:2mm 2.5mm;font-size:8px;line-height:1.45}
+.page .mps-score-notice strong{font-size:9px}
+.page .mps-score-notice p{margin-top:1mm}
+.page .mps-score-notice small{font-size:7px;margin-top:1mm}
+#page2:has(>#scoreReviewNotice:not([hidden])){gap:1mm}
+#page2:has(>#scoreReviewNotice:not([hidden])) .chart-section{padding:2mm}
+#page2:has(>#scoreReviewNotice:not([hidden])) .recovery{padding:2mm}
+.page#page2:has(#scoreReviewNotice:not([hidden])){gap:.4mm}
+.page:has(#scoreReviewNotice:not([hidden])) .score-card{padding-top:2mm;padding-bottom:2mm}
+.page:has(#scoreReviewNotice:not([hidden])):not(#page2){gap:2mm}
+@media print{.mps-score-notice{box-shadow:none;break-inside:avoid;page-break-inside:avoid}}

@@ -1,0 +1,53 @@
+// Complete ruleset based on the current user-provided public rules.
+// Only mental collections are restricted; all other collections retain the existing public policy.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function mentalCoach() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider != 'anonymous'
+        && request.auth.token.get('mentalCoach', false) == true;
+    }
+    function mentalPlayer(playerId) {
+      return mentalCoach()
+        && (request.auth.token.get('mentalAdmin', false) == true
+          || playerId in request.auth.token.get('mentalPlayerIds', []));
+    }
+    match /mental_players/{playerId} {
+      allow read, create, update: if mentalPlayer(playerId);
+      allow delete: if false;
+    }
+    match /mental_sessions/{sessionId} {
+      allow read: if mentalPlayer(resource.data.playerId);
+      allow create: if mentalPlayer(request.resource.data.playerId);
+      allow update: if mentalPlayer(resource.data.playerId)
+        && request.resource.data.playerId == resource.data.playerId;
+      allow delete: if false;
+    }
+    match /mental_summaries/{playerId} {
+      allow read: if mentalPlayer(resource.data.playerId);
+      allow create: if mentalPlayer(playerId)
+        && request.resource.data.playerId == playerId;
+      allow update: if mentalPlayer(resource.data.playerId)
+        && request.resource.data.playerId == resource.data.playerId
+        && request.resource.data.playerId == playerId;
+      allow delete: if false;
+    }
+    match /mental_report_players/{playerId} {
+      allow read, create, update: if mentalPlayer(playerId);
+      allow delete: if false;
+    }
+    match /mental_reports/{reportId} {
+      allow read: if mentalPlayer(resource.data.playerId);
+      allow create: if mentalPlayer(request.resource.data.playerId);
+      allow update: if mentalPlayer(resource.data.playerId)
+        && request.resource.data.playerId == resource.data.playerId;
+      allow delete: if false;
+    }
+    match /{collection}/{document=**} {
+      allow read, write: if !(collection in [
+        'mental_players', 'mental_sessions', 'mental_summaries', 'mental_reports', 'mental_report_players'
+      ]);
+    }
+  }
+}
