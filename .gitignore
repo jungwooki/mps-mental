@@ -1,6 +1,11 @@
 .env
+.env.*
+!.env.example
+.vercel/
 __pycache__/
 .DS_Store
 test-results/
 .venv/
 *service-account*.json
+.vercel
+.env*

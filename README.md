@@ -54,6 +54,22 @@ python3 mps-mental/server.py
 
 정적 호스팅만 사용할 경우 Firebase 저장은 작동하지만 Python AI 서버를 별도로 운영해야 합니다. 다른 서버에 연결하려면 `config.js`의 엔드포인트와 서버의 허용 출처 정책을 해당 배포에 맞게 설정하세요. 현재 서버는 같은 출처 요청을 허용합니다.
 
+### Vercel 배포
+
+`api/*.py`가 기존 서버의 인증·권한 검증을 사용하는 Vercel Functions로 배포됩니다.
+프로젝트 Root Directory는 이 저장소 루트, Framework Preset은 Other로 설정하고,
+별도 정적 출력 폴더를 지정하지 않습니다. `requirements.txt`로 Python 의존성을 설치합니다.
+
+Vercel 프로젝트 Settings → Environment Variables의 Production에 다음 값을 설정한 뒤 재배포하세요.
+
+- `OPENAI_API_KEY`: 새로 발급한 실제 키. 로컬 `.env`는 배포되지 않습니다.
+- `FIREBASE_SERVICE_ACCOUNT_JSON`: `mpsreserve` Firebase 서비스 계정 JSON 전체를 비공개 환경변수로 입력합니다. 토큰 검증용 서버 인증정보이며 Git에 파일로 추가하지 않습니다.
+- `OPENAI_MODEL`, `OPENAI_TRANSCRIBE_MODEL`: 필요할 때만 지정합니다.
+
+배포 후 `/api/health`가 JSON으로 `ready: true`를 반환하는지 확인합니다.
+이 상태는 OpenAI 키 존재 여부만 확인하며 실제 키 유효성이나 Firebase 인증 성공을 의미하지는 않습니다.
+로그인 후 최근 회차 요약과 녹음 요약을 확인하세요.
+
 참고: [OpenAI 텍스트 생성](https://developers.openai.com/api/docs/guides/text), [Firebase 실시간 조회](https://firebase.google.com/docs/firestore/query-data/listen), [Firebase 인증 REST API](https://firebase.google.com/docs/reference/rest/auth).
 
 ## 포함 자료

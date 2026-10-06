@@ -30,10 +30,12 @@ def claims_for(token):
         raise APIError(401, '코치 로그인이 필요합니다.')
     try:
         import firebase_admin
-        from firebase_admin import auth
+        from firebase_admin import auth, credentials
         with _lock:
             if _admin is None:
-                _admin = firebase_admin.initialize_app(options={'projectId': 'mpsreserve'}, name='mental-recording')
+                service_account = os.environ.get('FIREBASE_SERVICE_ACCOUNT_JSON')
+                credential = credentials.Certificate(json.loads(service_account)) if service_account else None
+                _admin = firebase_admin.initialize_app(credential, options={'projectId': 'mpsreserve'}, name='mental-recording')
         # Admin SDK initializes its Auth client with server credentials.
         _admin.credential.get_credential()
         claims = auth.verify_id_token(token, app=_admin)
