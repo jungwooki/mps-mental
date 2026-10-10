@@ -161,6 +161,7 @@ export function createRecording({context, token, insert, ready, notify, root = d
   }
   async function keepAwake(generation) {
     if (!navigator.wakeLock || document.visibilityState !== 'visible') return;
+    if (wakeLock && !wakeLock.released) return;
     try {
       const lock = await navigator.wakeLock.request('screen');
       if (generation !== serial || !capturing()) {await lock.release(); return;}

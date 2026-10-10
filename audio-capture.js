@@ -57,6 +57,7 @@ export async function startCapture({onPart, onLimit, onError}) {
     }
   }
   const release = () => {
+    if (closed) return;
     closed = true;
     stream.getTracks().forEach(track => {track.onended = null; track.stop();});
     source?.disconnect(); node?.disconnect();
