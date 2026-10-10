@@ -22,6 +22,8 @@ class Handler(SimpleHTTPRequestHandler):
         if path in modules:return self.send(modules[path],'text/javascript')
         if path.endswith('/firebase-diary.js'):return self.send((ROOT/'resources/20260916 diary/firebase-diary.js').read_text().replace('https://www.gstatic.com/firebasejs/11.6.1/','/test-firebase/'),'text/javascript')
         if path=='/mps-mental/app.js':return self.send((ROOT/'app.js').read_text().replace('https://www.gstatic.com/firebasejs/11.6.1/','/test-firebase/'),'text/javascript')
+        if path=='/mps-mental/index.html' and 'recordingTest=1' in self.path:
+            return self.send((ROOT/'index.html').read_text().replace('<script type="module" src="app.js">', '<script src="tests/capture-fixture.js"></script><script type="module" src="app.js">'), 'text/html')
         if path.startswith('/test-data/'):return self.send(DATA[path.rsplit('/',1)[-1]])
         if path.endswith('/api/health'):return self.send({'ready':True})
         super().do_GET()

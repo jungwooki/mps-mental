@@ -105,9 +105,9 @@ python3 -m unittest discover -s mps-mental/tests -p 'test_*.py'
 
 ## 회차 상담 녹음·전사·요약
 
-기존 회차 `note` 아래에 녹음을 붙였습니다. 시작할 때만 마이크 권한을 요청하며 일시정지/재개/종료/취소를 지원합니다. 원문 녹취와 다섯 항목의 요약은 별도로 미리보기합니다. **메모에 삽입**을 누르면 현재 메모 뒤에 날짜가 있는 요약을 추가하고 기존 `write('sessions', id, {note})` 자동저장을 사용합니다. 승인 전 결과는 localStorage/Firestore에 저장하지 않습니다. 전체 녹취는 이번 버전에서 영구 저장하지 않으며, 승인된 요약만 기존 `note`에 남깁니다. 컬렉션/필드 변경은 없습니다.
+기존 회차 `note` 아래에 녹음을 붙였습니다. 시작할 때만 마이크 권한을 요청하며 일시정지/재개/종료/취소를 지원합니다. 원문 녹취와 다섯 항목의 요약은 별도로 미리보기합니다. **메모에 삽입**을 누르면 현재 메모 뒤에 날짜가 있는 요약을 추가하고 기존 `write('sessions', id, {note})` 자동저장을 사용합니다. 승인 전 결과는 localStorage/Firestore에 저장하지 않습니다. 전체 녹취는 서버에 영구 저장하지 않으며, 승인된 요약만 기존 `note`에 남깁니다. 컬렉션/필드 변경은 없습니다.
 
-선수·회차·코치 UID를 시작 시 고정하고 요청과 삽입에서 다시 확인합니다. 변경 시 요청을 취소하고 미리보기와 음성을 폐기합니다. 전사 실패 시 음성을 메모리에 유지해 재시도하고, 전사 성공 시 음성을 폐기합니다. 요약 실패 시 녹취를 유지해 다시 요약합니다. 삽입 후 저장 실패 시 기존 기기 임시저장과 재시도 큐가 메모를 보존합니다. 페이지를 닫거나 새로고침하면 승인 전 초안은 폐기됩니다.
+선수·회차·코치 UID를 시작 시 고정하고 요청과 삽입에서 다시 확인합니다. 변경 시 요청을 취소하고 미리보기와 음성을 폐기합니다. 전사 실패 시 음성을 메모리에 유지해 재시도하고, 성공한 구간은 다시 전사하지 않습니다. 음성은 삽입·취소·회차 전환·페이지 종료 전까지 메모리에 유지하며 원본 WAV를 내려받을 수 있습니다. 요약 실패 시 녹취를 유지해 다시 요약합니다. 삽입 후 저장 실패 시 기존 기기 임시저장과 재시도 큐가 메모를 보존합니다. 페이지를 닫거나 새로고침하면 승인 전 초안은 폐기됩니다.
 
 ### 실행 및 서버 환경
 
@@ -119,10 +119,10 @@ mps-mental/.venv/bin/python mps-mental/server.py --port 8787
 ```
 
 - `OPENAI_API_KEY`: 서버 환경 또는 비공개 `.env`에만 설정합니다.
-- `OPENAI_TRANSCRIBE_MODEL`: 기본 `gpt-4o-transcribe`, 한국어 `language='ko'`. 음성 파일은 SDK 업로드만 사용하며 서버 디스크에 기록하지 않습니다.
+- `OPENAI_TRANSCRIBE_MODEL`: 기본 `gpt-4o-transcribe-diarize`, 한국어 `language='ko'`. 음성 파일은 SDK 업로드만 사용하며 서버 디스크에 기록하지 않습니다.
 - `OPENAI_MODEL`: 기본 `gpt-4.1-mini`. Responses API strict JSON Schema, `store=False`를 사용합니다.
 - 설치 확인 버전: OpenAI Python 2.48.0, firebase-admin 7.7.0. Python 3.9.6에서 검증했습니다. 운영은 지원되는 Python 런타임을 사용하세요.
-- HTTPS 또는 localhost에서 최신 Chrome/Safari를 사용합니다. WebM/Opus 우선, Safari MP4 대체, Ogg 지원입니다. 24MB 또는 45분 이내로 회차 녹음을 나누어 사용합니다. 초과 시 재녹음 안내가 나오므로 긴 상담은 짧게 나눠 진행하세요.
+- HTTPS 또는 localhost에서 최신 Chrome/Safari를 사용합니다. AudioWorklet으로 16kHz 모노 PCM을 연속 수집합니다. 일시정지를 제외한 음성 길이 60분에 자동 종료합니다. 90초 WAV 구간(2,880,044바이트)을 순서대로 전사하여 Vercel의 요청 용량 제한 안에 유지합니다.
 
 새 API는 기존 서버의 `/mps-mental/api/transcribe`(음성 Blob) 및 `/mps-mental/api/consultation-summary`(JSON 녹취)입니다. 두 요청 모두 Firebase ID token과 `X-Player-ID`, `X-Session-ID`가 필요합니다. 서버는 Admin SDK로 `mpsreserve` 토큰을 검증하고 코치 claim·담당 선수·Firestore 실제 회차의 `playerId`를 확인합니다. 같은 사용자/단계의 빠른 반복 요청은 제한합니다. 기존 최근 4회 API도 같은 코치/선수/회차 권한 검증을 적용했습니다. 새 Functions/새 Firebase 프로젝트는 만들지 않았습니다.
 
@@ -146,7 +146,7 @@ mps-mental/.venv/bin/python mps-mental/server.py --port 8787
 
 ### 배포
 
-정적 HTML만 Firebase Hosting/Vercel에 올리면 Python API는 동작하지 않습니다. 기존 서버를 HTTPS 뒤에서 실행하고 같은 origin의 `/mps-mental/api/*`를 서버에 연결해야 합니다. 배포 플랫폼은 현재 이 폴더에 연결되어 있지 않으며 Functions/Vercel Console 변경은 수행하지 않았습니다. Vercel 사용 시 별도 서버 서비스에 같은 경로를 프록시하거나 실제 Python 런타임 배포 구성을 마련한 뒤 확인하세요. Admin 서비스 계정 파일은 웹 루트나 저장소에 두지 않습니다. 토큰 서명 검증은 Google 공개 인증서를 사용하지만 Admin SDK Auth 클라이언트 초기화에도 서버의 Application Default Credentials가 필요합니다. Google 환경에서는 서비스 계정 실행 권한을 사용하고, 로컬에서는 비공개 Admin 자격 증명 경로를 `GOOGLE_APPLICATION_CREDENTIALS`로 지정하세요. claim 관리 스크립트도 Admin 자격 증명이 필요합니다.
+정적 HTML만 Firebase Hosting/Vercel에 올리면 Python API는 동작하지 않습니다. 기존 서버를 HTTPS 뒤에서 실행하고 같은 origin의 `/mps-mental/api/*`를 서버에 연결해야 합니다. 현재 GitHub `jungwooki/mps-mental`의 `main`과 기존 Vercel `mentalchart`가 연결되어 있으며, `api/*.py`와 `vercel.json`으로 Python API를 배포합니다. 정적 파일만 별도 호스팅할 때는 같은 경로의 API 프록시가 필요합니다. Admin 서비스 계정 파일은 웹 루트나 저장소에 두지 않습니다. 토큰 서명 검증은 Google 공개 인증서를 사용하지만 Admin SDK Auth 클라이언트 초기화에도 서버의 Application Default Credentials가 필요합니다. Google 환경에서는 서비스 계정 실행 권한을 사용하고, 로컬에서는 비공개 Admin 자격 증명 경로를 `GOOGLE_APPLICATION_CREDENTIALS`로 지정하세요. claim 관리 스크립트도 Admin 자격 증명이 필요합니다.
 
 ### 검증
 
@@ -234,3 +234,13 @@ npx --yes --package agent-browser agent-browser --session mental-test eval --std
 ## 회차 완료 표시
 
 ‘상담 마무리’는 회차에 `completedAt`·`completedBy`를 저장합니다. 해당 변경의 서버 저장이 확인되면 회차 목록 오른쪽에 작은 초록 원(상담 마무리 완료)을 표시합니다. 저장 실패·대기 중에는 새 완료 표시를 보이지 않으며, 재시도 성공 후 표시합니다. 새로고침 후 유지되고 기존 회차는 자동으로 완료 처리하지 않습니다. 완료 후 메모 수정은 완료 상태를 유지합니다. `tests/session_completion_browser_flow.js`로 저장 실패/재시도·회차 격리·빈 회차 차단을 검증합니다.
+
+## 60분 연속 녹음 (2026-10-10)
+
+녹음 중 90초마다 독립적인 WAV 파일을 전사합니다. 마이크를 재시작하지 않으므로 구간 경계에서 녹음이 끊기지 않습니다. 마지막 짧은 구간은 종료 시 전송하고, 모든 구간이 성공한 후 전체 녹취를 한 번 요약합니다. 네트워크·일시적 서버 오류는 구간당 최대 3회 시도하고, 그래도 실패하면 음성을 보관해 수동 재시도합니다. 성공한 구간은 재호출하지 않습니다. 인증 오류는 자동 반복하지 않습니다.
+
+독립된 요청의 화자 번호는 같은 사람임을 보장하지 않으므로 `1구간 화자 1`, `2구간 화자 1`을 별도로 표시합니다. 역할을 지정한 후 다시 요약할 수 있습니다. 미지정 화자를 선수나 코치로 추정하지 않습니다.
+
+기기가 지원하면 화면 자동 잠금을 막는 Screen Wake Lock을 요청합니다. 마이크 해제·오디오 처리 중단 시 확보된 구간을 유지하고 종료합니다. 브라우저/OS 강제 종료·절전·모바일 백그라운드 녹음을 보장하지 않습니다. 상담 중 화면을 켜둔 채 이용하세요. 음성 및 승인 전 녹취는 서버/기기 저장소에 자동 보관하지 않으며 새로고침하면 사라집니다. 원본이 필요하면 메모 삽입 또는 페이지 종료 전에 `녹음 원본 내려받기`를 누르세요. 저장한 원본은 `녹음 원본 불러오기`로 다시 전사할 수 있습니다. 가져오기는 16kHz 모노 16비트 PCM WAV, 최대 60분의 원본 형식만 지원합니다.
+
+추가 검증: `node --test tests/long-recording.test.mjs` (60분 음성 수집, 구간 제한, 전사 실패/복구, 취소 경쟁, 요약 재시도).
